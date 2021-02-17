@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockPaperScissorsGame.Server", "RockPaperScissorsGame.Server\RockPaperScissorsGame.Server.csproj", "{093C201C-82A2-4E9E-96C3-08240C3669B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockPaperScissorsGame.Client", "RockPaperScissorsGame.Client\RockPaperScissorsGame.Client.csproj", "{A97A6374-0411-42AA-AECB-E5D550C98926}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{093C201C-82A2-4E9E-96C3-08240C3669B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{093C201C-82A2-4E9E-96C3-08240C3669B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{093C201C-82A2-4E9E-96C3-08240C3669B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{093C201C-82A2-4E9E-96C3-08240C3669B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A97A6374-0411-42AA-AECB-E5D550C98926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A97A6374-0411-42AA-AECB-E5D550C98926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A97A6374-0411-42AA-AECB-E5D550C98926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A97A6374-0411-42AA-AECB-E5D550C98926}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {254F9820-00BC-4E99-B0D2-7F36B617C7AE}
+	EndGlobalSection
+EndGlobal
