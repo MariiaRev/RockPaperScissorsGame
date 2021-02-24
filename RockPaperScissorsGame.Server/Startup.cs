@@ -28,7 +28,6 @@ namespace RockPaperScissorsGame.Server
                     .AddSingleton<IStatisticsService, StatisticsService>()
                     .AddSingleton<IUsersService, UsersService>()
                     .Configure<JsonPathsOptions>(Configuration.GetSection("JsonPaths"))
-                    .Configure<UserSettingsOptions>(Configuration.GetSection("UserSettings"))
                     .Configure<StatisticsOptions>(Configuration.GetSection("StatisticsSettings"));
 
             services.AddSwaggerGen(c =>
