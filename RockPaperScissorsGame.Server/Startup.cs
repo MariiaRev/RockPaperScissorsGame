@@ -1,14 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using RockPaperScissorsGame.Server.Services;
+using RockPaperScissorsGame.Server.Options;
+using Microsoft.OpenApi.Models;
 
 namespace RockPaperScissorsGame.Server
 {
@@ -25,20 +22,35 @@ namespace RockPaperScissorsGame.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSingleton(typeof(IStorage<>), typeof(Storage<>))
+                    .AddSingleton(typeof(JsonDataService<>))
+                    .AddSingleton<IStatisticsService, StatisticsService>()
+                    .AddSingleton<IUsersService, UsersService>()
+                    .Configure<JsonPathsOptions>(Configuration.GetSection("JsonPaths"))
+                    .Configure<UserSettingsOptions>(Configuration.GetSection("UserSettings"))
+                    .Configure<StatisticsOptions>(Configuration.GetSection("StatisticsSettings"));
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "RockPaperScissorsGame.Server", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            var statisticsService = app.ApplicationServices.GetRequiredService<IStatisticsService>();
+            var usersService = app.ApplicationServices.GetRequiredService<IUsersService>();
+
+            statisticsService.SetupStorage();
+            usersService.SetupStorage();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contrllrs.Notes v1"));
 
             app.UseRouting();
-
-            app.UseAuthorization();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

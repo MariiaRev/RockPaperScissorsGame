@@ -1,0 +1,19 @@
+{
+  "userId": 2,
+  "history": {
+    "20.02.2021": {
+      "winsCount": 3,
+      "lossesCount": 2,
+      "drawsCount": 1
+    },
+    "21.02.2021": {
+      "winsCount": 1,
+      "lossesCount": 2,
+      "drawsCount": 2
+    }
+  },
+  "rockCount": 5,
+  "paperCount": 4,
+  "scissorsCount": 2,
+  "gameTime": 38000000000
+}
