@@ -1,0 +1,22 @@
+[
+  {
+    "userId": 1,
+    "login": "login1",
+    "password": "1111111"
+  },
+  {
+    "userId": 2,
+    "login": "login2",
+    "password": "33322211"
+  },
+  {
+    "userId": 3,
+    "login": "login3",
+    "password": "333333"
+  },
+  {
+    "userId": 4,
+    "login": "login4",
+    "password": "12341234"
+  }
+]
