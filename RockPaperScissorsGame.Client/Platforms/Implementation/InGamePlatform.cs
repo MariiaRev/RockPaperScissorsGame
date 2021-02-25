@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using RockPaperScissorsGame.Client.Platforms.Abstract;
@@ -22,12 +23,17 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         private readonly IInGameService _inGameService;
         private readonly IConnectionService _connectionService;
         private readonly IOptions<AppSettings> _appSettings;
+        private readonly ILogger<InGamePlatform> _logger;
 
-        public InGamePlatform(IInGameService inGameService, IConnectionService connectionService, IOptions<AppSettings> appSettings)
+        public InGamePlatform(IInGameService inGameService,
+                                IConnectionService connectionService, 
+                                IOptions<AppSettings> appSettings, 
+                                ILogger<InGamePlatform> logger)
         {
             _inGameService = inGameService;
             _connectionService = connectionService;
             _appSettings = appSettings;
+            _logger = logger;
         }
 
         private async Task<bool> EnsureConnectionConfigured()
@@ -68,8 +74,12 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         
         private async Task MakeMove()
         {
+            _logger.LogInformation($"{nameof(InGamePlatform)}: Start of making move");
+
             if (!await EnsureConnectionConfigured())
             {
+                _logger.LogError($"{nameof(InGamePlatform)}: Unable to connect to the server");
+
                 return;
             }
             
@@ -78,6 +88,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 new TimerCallback(async state =>
                 {
                     isMoveMadeInTime = false;
+                    _logger.LogInformation($"{nameof(InGamePlatform)}: Move time expired");
                     await _inGameService.MakeMoveAsync(PlayerId, MoveOptions.Undefined, isMoveMadeInTime);
                 }),
                 null,
@@ -124,6 +135,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             {
                 await timer.DisposeAsync();
                 _keepSessionActiveTimer.Change(_appSettings.Value?.SeriesTimeout ?? 300000, Timeout.Infinite);
+                _logger.LogInformation($"{nameof(InGamePlatform)}: Move made in time");
                 await _inGameService.MakeMoveAsync(PlayerId, figure, isMoveMadeInTime);
             } 
         }

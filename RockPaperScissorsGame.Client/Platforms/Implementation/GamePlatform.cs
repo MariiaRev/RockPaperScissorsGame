@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RockPaperScissorsGame.Client.Exceptions;
 using RockPaperScissorsGame.Client.Platforms.Abstract;
 using RockPaperScissorsGame.Client.Platforms.Base;
@@ -13,27 +14,32 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
     {
         private readonly IGameService _gameService;
         private readonly IInGamePlatform _inGamePlatform;
+        private readonly ILogger<GamePlatform> _logger;
         private readonly HttpClient _client;
 
-        public GamePlatform(IGameService gameService, IInGamePlatform inGamePlatform/*, HttpClient client*/)
+        public GamePlatform(IGameService gameService, IInGamePlatform inGamePlatform, ILogger<GamePlatform> logger/*, HttpClient client*/)
         {
             _gameService = gameService;
             _inGamePlatform = inGamePlatform;
+            _logger = logger;
             //_client = client;
         }
         
         private async Task FindPublicGame()
         {
+            _logger.LogInformation($"{nameof(GamePlatform)}: Start finding of public room");
             Console.WriteLine("\nFinding opponent...");
             try
             {
                 string resultEvent = await _gameService.FindPublicGame(PlayerId);
                 if (resultEvent.Equals(GameEvents.GameStart))
                 {
+                    _logger.LogInformation($"{nameof(GamePlatform)}: Server added user to public room with player in it");
                     await _inGamePlatform.StartAsync(0);
                 }
                 else if (resultEvent.Equals(GameEvents.WaitingForPlayerToJoin))
                 {
+                    _logger.LogInformation($"{nameof(GamePlatform)}: Server added user to a empty public room");
                     await _inGamePlatform.StartAsync(30);
                 }
                 else if (resultEvent.Equals(GameEvents.ErrorOccured))
@@ -42,18 +48,23 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                     // just return to the menu
                 }
                 else
-                {
+                {                    
+                    _logger.LogError($"{nameof(GamePlatform)}: Server returned unexpected event");
+                    
                     throw new UnexpectedBehaviorException("Server returned unexpected event");
                 }
             }
             catch (ConnectionException exception)
             {
+                _logger.LogError($"{nameof(GamePlatform)}: Unable to connect to the server");
+
                 Console.WriteLine(exception.Message);
             }
         }
         
         private async Task CreatePrivateGame()
         {
+            _logger.LogInformation($"{nameof(GamePlatform)}: Creating of private room started");
             Console.WriteLine("Creating private game...");
             try
             {
@@ -62,6 +73,8 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 if (resultEvent.Equals(GameEvents.WaitingForPlayerToJoin))
                 {
                     Console.WriteLine("Warning: If nobody will join this game in next 60 seconds it will be automatically closed");
+                    _logger.LogInformation($"{nameof(GamePlatform)}: Empty private room is created");
+
                     await _inGamePlatform.StartAsync(60);
                 }
                 else if (resultEvent.Equals(GameEvents.ErrorOccured))
@@ -71,11 +84,15 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 }
                 else
                 {
+                    _logger.LogError($"{nameof(GamePlatform)}: Server returned unexpected event");
+
                     throw new UnexpectedBehaviorException("Server returned unexpected event");
                 }
             }
             catch (ConnectionException exception)
             {
+                _logger.LogError($"{nameof(GamePlatform)}: Unable to connect to the server");
+
                 Console.WriteLine(exception.Message);
             }
         }
@@ -84,6 +101,8 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         {
             try
             {
+                _logger.LogInformation($"{nameof(GamePlatform)}: Connection to te private room starts");
+
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.Write("Enter private room token: ");
                 Console.ResetColor();
@@ -93,6 +112,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 string resultEvent = await _gameService.JoinPrivateRoom(PlayerId, token);
                 if (resultEvent.Equals(GameEvents.GameStart))
                 {
+                    _logger.LogInformation($"{nameof(GamePlatform)}: Joined to the desired private room");
                     await _inGamePlatform.StartAsync(0);
                 }
                 else if (resultEvent.Equals(GameEvents.ErrorOccured))
@@ -102,11 +122,15 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 }
                 else
                 {
+                    _logger.LogError($"{nameof(GamePlatform)}: Server returned unexpected event");
+
                     throw new UnexpectedBehaviorException("Server returned unexpected event");
                 }
             }
             catch (ConnectionException exception)
             {
+                _logger.LogError($"{nameof(GamePlatform)}: Unable to connect to the server");
+
                 Console.WriteLine(exception.Message);
             }
         }

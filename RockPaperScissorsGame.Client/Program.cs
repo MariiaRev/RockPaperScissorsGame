@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 using RockPaperScissorsGame.Client.Platforms.Abstract;
 using RockPaperScissorsGame.Client.Platforms.Implementation;
@@ -28,6 +29,10 @@ namespace RockPaperScissorsGame.Client
                 .AddSingleton<IGameService, GameService>()
                 .AddSingleton<IInGameService, InGameService>()
                 .Configure<AppSettings>(configuration.GetSection("App"))
+                .AddLogging(builder => builder.AddSerilog(
+                    new LoggerConfiguration()
+                        .WriteTo.File("Logs/client.log")
+                        .CreateLogger()))
                 .BuildServiceProvider();
 
             var gamePlatform = serviceProvider.GetRequiredService<IGamePlatform>();
