@@ -96,7 +96,7 @@ namespace RockPaperScissorsGame.Client.Services
 
                     // if user was authorized update his/her auth token
                     await _authToken.UpdateAsync(new AuthToken(authToken));
-                    Console.WriteLine("You are succesfully authorized.");
+                    Console.WriteLine("\nYou are succesfully authorized.");
                     return true;
                 }
                 catch(Exception e)
@@ -165,9 +165,38 @@ namespace RockPaperScissorsGame.Client.Services
             Console.WriteLine($"\n\n{content}");
         }
 
-        public void ShowUserStatisticsAsync()
+        public async Task ShowUserStatisticsAsync()
         {
+            try
+            {
+                // ask to send request
+                (var success, var content) = await _requestsForStatistics.GetUserStatisticsAsync();
 
+                if (success)
+                {
+                    try
+                    {
+                        // try deserialise json string (content) into list of UserStatistics
+                        var statistics = JsonConvert.DeserializeObject<UserStatistics>(content);
+                        Console.WriteLine($"\n\n{" ", 4}$$$ Your statistics $$$\n\n{statistics}");
+                        Console.WriteLine("-----------------------------------------------------------------");
+                        return;
+                    }
+                    catch (JsonSerializationException)
+                    {
+                        Console.WriteLine($"\n\nWe're sorry, an error occured. Statistics is temporarily unavailable.");
+                        //logger log serialization error
+                        return;
+                    }
+                }
+
+                // if no statistics
+                Console.WriteLine($"\n\n{content}");
+            }
+            catch(ArgumentNullException)
+            {
+                Console.WriteLine("\n\nPlease, authorize before viewing personal statistics.");
+            }
         }
 
         private (string, string) AcceptLoginPassword()
