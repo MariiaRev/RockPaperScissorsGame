@@ -1,30 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using RockPaperScissorsGame.Client.Models;
 using RockPaperScissorsGame.Client.Options;
 
 namespace RockPaperScissorsGame.Client.Services
 {
     public class UserInteractions
     {
-        private readonly IUserInput _userInputService;
+        private readonly IUserInput _userInput;
         private readonly UserInfoOptions _options;
-        private readonly ForAuthorizationAndRegistration _authRegistrationService;
-        private readonly ISingleStorage<string> _authToken;
+        private readonly ForAuthorizationAndRegistration _authRegistration;
+        private readonly RequestsForStatistics _requestsForStatistics;
+        private readonly ISingleStorage<AuthToken> _authToken;
 
         private int _authorizationAttempts = 0;
         private DateTime? _authBlockedAt = null;
 
         public UserInteractions(
-            IUserInput userInputService,
+            IUserInput userInput,
             IOptions<UserInfoOptions> options,
-            ForAuthorizationAndRegistration authRegistrationService,
-            ISingleStorage<string> authToken)
+            ForAuthorizationAndRegistration authRegistration,
+            RequestsForStatistics requestsForStatistics,
+            ISingleStorage<AuthToken> authToken)
         {
-            _userInputService = userInputService;
+            _userInput = userInput;
             _options = options.Value;
-            _authRegistrationService = authRegistrationService;
+            _authRegistration = authRegistration;
+            _requestsForStatistics = requestsForStatistics;
             _authToken = authToken;
         }
 
@@ -56,7 +62,7 @@ namespace RockPaperScissorsGame.Client.Services
                 try
                 {
                     _authorizationAttempts++;
-                    var authToken = await _authRegistrationService.AuthorizeAsync(login, password);
+                    var authToken = await _authRegistration.AuthorizeAsync(login, password);
 
                     // if user was not authorized
                     if (authToken == null)
@@ -78,7 +84,7 @@ namespace RockPaperScissorsGame.Client.Services
                             var message = $"Enter anything to retry authorization or enter '{exitWord}' to exit to the previous menu:";
                             
                             // if user entered anything but not the exit-word
-                            if (!_userInputService.ReadString(message, exitWord, true))
+                            if (!_userInput.ReadString(message, exitWord, true))
                             {
                                 await AuthorizeUserAsync();
                             }
@@ -89,7 +95,7 @@ namespace RockPaperScissorsGame.Client.Services
                     }
 
                     // if user was authorized update his/her auth token
-                    _authToken.Update(authToken);
+                    await _authToken.UpdateAsync(new AuthToken(authToken));
                     Console.WriteLine("You are succesfully authorized.");
                     return true;
                 }
@@ -114,7 +120,7 @@ namespace RockPaperScissorsGame.Client.Services
             {
                 try
                 {
-                    (var success, var message ) = await _authRegistrationService.RegisterAsync(login, password);
+                    (var success, var message ) = await _authRegistration.RegisterAsync(login, password);
                     Console.WriteLine($"\n\n{message}");
                 }
                 catch (Exception e)
@@ -124,9 +130,39 @@ namespace RockPaperScissorsGame.Client.Services
             }
         }
 
-        public void ShowLeaderboardAsync()
+        public async Task ShowLeaderboardAsync()
         {
+            // ask to send request
+            (var success, var content) = await _requestsForStatistics.GetLeaderboardAsync();
 
+            if (success)
+            {
+                try
+                {
+                    // try deserialise json string (content) into list of UserStatistics
+                    var statistics = JsonConvert.DeserializeObject<List<UserStatistics>>(content);
+
+                    // show leaderboard
+                    Console.WriteLine($"\n\n{" ", 4}$$$ LEADERBOARD $$$\n");
+
+                    foreach(var userStatistics in statistics)
+                    {
+                        Console.WriteLine($"{userStatistics}");
+                    }
+
+                    Console.WriteLine("-----------------------------------------------------------------");
+                    return;
+                }
+                catch (JsonSerializationException)
+                {
+                    Console.WriteLine($"\n\nWe're sorry, an error occured. Statistics is temporarily unavailable.");
+                    //logger log serialization error
+                    return;
+                }
+            }
+
+            // if no statistics
+            Console.WriteLine($"\n\n{content}");
         }
 
         public void ShowUserStatisticsAsync()
@@ -139,7 +175,7 @@ namespace RockPaperScissorsGame.Client.Services
             var exitWord = "exit";
             var message = "\n\nEnter your login, please:";
             var tryAgainMessage = $"\n\nLogin should contain at least {_options.LoginMinLength} character(s). Try again or enter {exitWord} to exit:";
-            var login = _userInputService.ReadString(message, tryAgainMessage, _options.LoginMinLength, exitWord);
+            var login = _userInput.ReadString(message, tryAgainMessage, _options.LoginMinLength, exitWord);
 
             if (login == null)
             {
@@ -149,7 +185,7 @@ namespace RockPaperScissorsGame.Client.Services
 
             message = "\n\nEnter your password, please:";
             tryAgainMessage = $"\n\nPassword should contain at least {_options.PasswordMinLength} character(s). Try again or enter {exitWord} to exit:";
-            var password = _userInputService.ReadString(message, tryAgainMessage, _options.PasswordMinLength, exitWord);
+            var password = _userInput.ReadString(message, tryAgainMessage, _options.PasswordMinLength, exitWord);
 
             if (password == null)
             {

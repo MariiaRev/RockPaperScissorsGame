@@ -27,6 +27,7 @@ namespace RockPaperScissorsGame.Client
                 var serviceProvider = new ServiceCollection()
                     .AddSingleton<Tests>()
                     .AddSingleton<ForAuthorizationAndRegistration>()
+                    .AddSingleton<RequestsForStatistics>()
                     .AddSingleton<UserInteractions>()
                     .AddSingleton<IUserInput, UserInput>()
                     .AddSingleton(typeof(ISingleStorage<>), typeof(SingleStorage<>))
