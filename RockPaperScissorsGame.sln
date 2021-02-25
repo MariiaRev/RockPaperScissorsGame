@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockPaperScissorsGame.Serve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockPaperScissorsGame.Client", "RockPaperScissorsGame.Client\RockPaperScissorsGame.Client.csproj", "{A97A6374-0411-42AA-AECB-E5D550C98926}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockPaperScissorsGame.Common", "RockPaperScissorsGame.Common\RockPaperScissorsGame.Common.csproj", "{9E3A5372-EFB3-4B8E-BCCF-66CF08FED5EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A97A6374-0411-42AA-AECB-E5D550C98926}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A97A6374-0411-42AA-AECB-E5D550C98926}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A97A6374-0411-42AA-AECB-E5D550C98926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E3A5372-EFB3-4B8E-BCCF-66CF08FED5EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E3A5372-EFB3-4B8E-BCCF-66CF08FED5EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E3A5372-EFB3-4B8E-BCCF-66CF08FED5EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E3A5372-EFB3-4B8E-BCCF-66CF08FED5EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
