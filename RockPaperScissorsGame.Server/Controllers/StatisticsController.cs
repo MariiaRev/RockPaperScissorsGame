@@ -41,7 +41,7 @@ namespace RockPaperScissorsGame.Server.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetStatisticsAsync()
         {
-            _logger.LogInformation("Request to get general statistics.");
+            _logger.LogInformation($"{nameof(StatisticsController)}: Request to get general statistics.");
             var statistics = await _statistics.GetAllAsync();
 
             if (statistics.Any())
@@ -52,11 +52,11 @@ namespace RockPaperScissorsGame.Server.Controllers
                           (stat, user) => ModelsMapper.ToStatisticsOut(user.Item.GetLogin(), stat.Item))
                     .Where(st => st.TotalRoundsCount > _options.MinRoundsCount);
 
-                _logger.LogInformation($"Show statistics of {statisticsOut.Count()} users. Return {HttpStatusCode.OK}");
+                _logger.LogInformation($"{nameof(StatisticsController)}: Show statistics for {statisticsOut.Count()} user(s). Return {HttpStatusCode.OK}");
                 return Ok(statisticsOut);
             }
 
-            _logger.LogInformation($"No statisctics to show. Return {HttpStatusCode.OK}");
+            _logger.LogInformation($"{nameof(StatisticsController)}: No statisctics to show. Return {HttpStatusCode.OK}");
             return Ok("No statistics yet.");
         }
 
@@ -67,7 +67,7 @@ namespace RockPaperScissorsGame.Server.Controllers
             [FromHeader(Name = "X-AuthToken"), Required]string token,
             [FromServices] IStorage<string> tokens)
         {
-            _logger.LogInformation("Request to get user statistics.");
+            _logger.LogInformation($"{nameof(StatisticsController)}: Request to get user statistics.");
             var userId = (await tokens.GetAllAsync())
                          .Where(tk => tk.Item == token)
                          .Select(tk => tk.Id)
@@ -75,24 +75,24 @@ namespace RockPaperScissorsGame.Server.Controllers
 
             if (userId > 0)     //if user was found
             {
-                _logger.LogInformation($"User with id {userId} was identified by his/her authorization token.");
+                _logger.LogInformation($"{nameof(StatisticsController)}: User with id {userId} was identified by his/her authorization token.");
                 // get user statistics
                 var statistics = await _statistics.GetAsync(userId);
 
                 if (statistics == null)
                 {
-                    _logger.LogWarning($"There is no statistics (even empty) for the user with id {userId}. Return {HttpStatusCode.NotFound}");
+                    _logger.LogWarning($"{nameof(StatisticsController)}: There is no statistics (even empty) for the user with id {userId}. Return {HttpStatusCode.NotFound}");
                     return NotFound($"No statistics for the user yet.");
                 }
 
                 var userLogin = (await _users.GetAsync(userId)).GetLogin();
                 var statisticsOut = ModelsMapper.ToStatisticsOut(userLogin, statistics);
-                _logger.LogInformation($"Show personal statistics to the user with id  {userId}. Return {HttpStatusCode.OK}");
+                _logger.LogInformation($"{nameof(StatisticsController)}: Show personal statistics to the user with id {userId}. Return {HttpStatusCode.OK}");
 
                 return Ok(statisticsOut);
             }
 
-            _logger.LogInformation($"Authorization token did not exist or expired. User was not identified. Return {HttpStatusCode.NotFound}");
+            _logger.LogInformation($"{nameof(StatisticsController)}: Authorization token did not exist or expired. User was not identified. Return {HttpStatusCode.NotFound}");
             return NotFound("User was not defined. Repeat authorization, please.");
         }
     }

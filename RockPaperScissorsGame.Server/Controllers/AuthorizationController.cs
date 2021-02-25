@@ -34,7 +34,7 @@ namespace RockPaperScissorsGame.Server.Controllers
         public async Task<IActionResult> LoginAsync([FromHeader(Name = "X-login"), Required] string login,
                                                     [FromHeader(Name = "X-password"), Required] string password)
         {
-            _logger.LogInformation("Request to execute user login.");
+            _logger.LogInformation($"{nameof(AuthorizationController)}: Request to execute user login.");
 
             var user = (await _users.GetAllAsync())
                         .Where(user => user.Item.GetLogin() == login && user.Item.VerifyPassword(password))
@@ -42,14 +42,14 @@ namespace RockPaperScissorsGame.Server.Controllers
 
             if (user == null)
             {
-                _logger.LogInformation($"Wrong login or password. User {login} is unauthorized. Return {HttpStatusCode.Unauthorized}");
+                _logger.LogInformation($"{nameof(AuthorizationController)}: Wrong login or password. User {login} is unauthorized. Return {HttpStatusCode.Unauthorized}");
                 return Unauthorized();
             }
 
             var token = await GenerateTokenAsync();
             await _tokens.AddOrUpdateAsync(user.Id, token);
 
-            _logger.LogInformation($"Correct login and password. User {login} is authorized. Return {HttpStatusCode.OK}");
+            _logger.LogInformation($"{nameof(AuthorizationController)}: Correct login and password. User {login} is authorized. Return {HttpStatusCode.OK}");
             return Ok(token);
         }
 
@@ -64,7 +64,7 @@ namespace RockPaperScissorsGame.Server.Controllers
             }
             while (tokens.Where(item => item.Item == token).Any());
 
-            _logger.LogInformation("The authorization token was generated.");
+            _logger.LogInformation($"{nameof(AuthorizationController)}: The authorization token was generated.");
             return token;
         }
     }
