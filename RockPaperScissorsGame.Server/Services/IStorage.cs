@@ -6,6 +6,9 @@ namespace RockPaperScissorsGame.Server.Services
 {
     public interface IStorage<T> where T: class
     {
+        int Count();
+        Task<int> CountAsync();
+
         T Get(int id);
         Task<T> GetAsync(int id);
 

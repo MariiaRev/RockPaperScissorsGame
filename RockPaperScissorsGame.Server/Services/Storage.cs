@@ -10,6 +10,16 @@ namespace RockPaperScissorsGame.Server.Services
     {
         private readonly ConcurrentDictionary<int, T> _data = new ConcurrentDictionary<int, T>();
 
+        public int Count()
+        {
+            return _data.Count();
+        }
+
+        public Task<int> CountAsync()
+        {
+            return Task.FromResult(Count());
+        }
+
         public T Get(int id)
         {
             return _data.TryGetValue(id, out var item) ? item : default;
@@ -72,7 +82,6 @@ namespace RockPaperScissorsGame.Server.Services
         public bool Delete(int id)
         {
             return _data.Remove(id, out _);
-            //return _data.TryRemove(id, out _);            //??? what the difference?
         }
 
         public Task<bool> DeleteAsync(int id)

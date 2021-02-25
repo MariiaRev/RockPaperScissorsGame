@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using RockPaperScissorsGame.Server.Models;
 using RockPaperScissorsGame.Server.Helpers;
 using RockPaperScissorsGame.Server.Options;
@@ -16,17 +17,20 @@ namespace RockPaperScissorsGame.Server.Services
         private readonly IStorage<string> _tokens;
         private readonly JsonDataService<StatisticsDb> _jsonDataService;
         private readonly JsonPathsOptions _options;
+        private readonly ILogger<StatisticsService> _logger;
 
         public StatisticsService(
             IStorage<UserStatistics> statistics,
             IStorage<string> tokens,
             JsonDataService<StatisticsDb> jsonDataService,
-            IOptions<JsonPathsOptions> jsonOptions)
+            IOptions<JsonPathsOptions> jsonOptions,
+            ILogger<StatisticsService> logger)
         {
             _statistics = statistics;
             _tokens = tokens;
             _jsonDataService = jsonDataService;
             _options = jsonOptions.Value;
+            _logger = logger;
         }
 
         /// <summary>
@@ -44,6 +48,9 @@ namespace RockPaperScissorsGame.Server.Services
             // if user was not found
             if (userWithToken == null)
             {
+                // only one logger message here so as not to litter the file with messages
+                // about saving statistics, since this method will be called very often
+                _logger.LogInformation($"{nameof(StatisticsService)}: User was not identified for saving statistics. The authorization token did not exist or expired.");
                 return false;
             }
 
@@ -73,8 +80,10 @@ namespace RockPaperScissorsGame.Server.Services
         /// <returns>Returns no value.</returns>
         public async void SetupStorage()
         {
+            _logger.LogInformation($"{nameof(StatisticsService)}: Initial setup of the statistics storage.");
             var statisticsFiles = Directory.GetFiles(_options.StatisticsPath);
             StatisticsDb fileData;
+            _logger.LogInformation($"{nameof(StatisticsService)}: {statisticsFiles.Length} files with statistics by each user were(was) found.");
 
             foreach (var file in statisticsFiles)
             {
@@ -87,6 +96,8 @@ namespace RockPaperScissorsGame.Server.Services
                     await _statistics.AddAsync(userStatistics, fileData.UserId);
                 }
             }
+
+            _logger.LogInformation($"{nameof(StatisticsService)}: Statistics for {statisticsFiles.Length} users was added to the statistics storage.");
         }
     }
 }
