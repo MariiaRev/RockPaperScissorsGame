@@ -1,4 +1,5 @@
 ﻿using System;
+using RockPaperScissorsGame.Server.Models.Game;
 
 namespace RockPaperScissorsGame.Server.Models
 {

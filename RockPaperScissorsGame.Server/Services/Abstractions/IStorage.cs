@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using RockPaperScissorsGame.Server.Models;
 
-namespace RockPaperScissorsGame.Server.Services
+namespace RockPaperScissorsGame.Server.Services.Abstractions
 {
     public interface IStorage<T> where T: class
     {

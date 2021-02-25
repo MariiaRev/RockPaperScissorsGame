@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using RockPaperScissorsGame.Client.Exceptions;
 using RockPaperScissorsGame.Client.Platforms.Abstract;
@@ -12,11 +13,13 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
     {
         private readonly IGameService _gameService;
         private readonly IInGamePlatform _inGamePlatform;
+        private readonly HttpClient _client;
 
-        public GamePlatform(IGameService gameService, IInGamePlatform inGamePlatform)
+        public GamePlatform(IGameService gameService, IInGamePlatform inGamePlatform/*, HttpClient client*/)
         {
             _gameService = gameService;
             _inGamePlatform = inGamePlatform;
+            //_client = client;
         }
         
         private async Task FindPublicGame()
@@ -108,6 +111,12 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             }
         }
         
+        private async Task PlayWithBot()
+        {
+            Console.WriteLine("Unimplemented...");
+            //_client.SendAsync()
+        }
+        
         private void Exit()
         {
             KeepProgramActive = false;
@@ -126,6 +135,9 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                     break;
                 case 3:
                     await JoinPrivateGame();
+                    break;
+                case 4:
+                    await PlayWithBot();
                     break;
                 case 0:
                     Exit();
@@ -147,6 +159,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             Console.WriteLine("1. Find public game");
             Console.WriteLine("2. Create private game");
             Console.WriteLine("3. Join private game");
+            Console.WriteLine("4. Play with bot");
             Console.WriteLine("0. Exit");
             
             Console.ResetColor();

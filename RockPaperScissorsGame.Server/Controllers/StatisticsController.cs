@@ -11,6 +11,7 @@ using RockPaperScissorsGame.Server.Options;
 using RockPaperScissorsGame.Server.Helpers;
 using RockPaperScissorsGame.Server.Models;
 using RockPaperScissorsGame.Server.Models.Out;
+using RockPaperScissorsGame.Server.Services.Abstractions;
 
 namespace RockPaperScissorsGame.Server.Controllers
 {

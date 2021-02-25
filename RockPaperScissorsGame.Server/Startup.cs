@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using RockPaperScissorsGame.Server.Services;
 using RockPaperScissorsGame.Server.Options;
 using Microsoft.OpenApi.Models;
+using RockPaperScissorsGame.Server.Hubs;
+using RockPaperScissorsGame.Server.Services.Abstractions;
+using RockPaperScissorsGame.Server.Services.Implementations;
 
 namespace RockPaperScissorsGame.Server
 {
@@ -20,6 +23,7 @@ namespace RockPaperScissorsGame.Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR();
             services.AddControllers();
 
             services.AddSingleton(typeof(IStorage<>), typeof(Storage<>))
@@ -28,7 +32,10 @@ namespace RockPaperScissorsGame.Server
                     .AddSingleton<IUsersService, UsersService>()
                     .Configure<JsonPathsOptions>(Configuration.GetSection("JsonPaths"))
                     .Configure<StatisticsOptions>(Configuration.GetSection("StatisticsSettings"));
-
+            
+            services.AddSingleton<IGameStoringService, GameStoringService>();
+            services.AddTransient<IGameService, GameService>();
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RockPaperScissorsGame.Server", Version = "v1" });
@@ -52,6 +59,7 @@ namespace RockPaperScissorsGame.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<GameHub>("/gamehuber");
             });
         }
     }

@@ -78,7 +78,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 new TimerCallback(async state =>
                 {
                     isMoveMadeInTime = false;
-                    await _inGameService.MakeMoveAsync(PlayerId, Figure.Undefined, isMoveMadeInTime);
+                    await _inGameService.MakeMoveAsync(PlayerId, MoveOptions.Undefined, isMoveMadeInTime);
                 }),
                 null,
                 _appSettings.Value?.MoveTimeout ?? 20000,
@@ -91,7 +91,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             Console.WriteLine("3. Scissors");
             Console.ResetColor();
 
-            Figure figure = Figure.Undefined;
+            MoveOptions figure = MoveOptions.Undefined;
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;

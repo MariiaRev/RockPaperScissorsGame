@@ -1,13 +1,14 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using RockPaperScissorsGame.Server.Options;
-using RockPaperScissorsGame.Server.Models;
+using Microsoft.Extensions.Options;
 using RockPaperScissorsGame.Server.Helpers;
+using RockPaperScissorsGame.Server.Models;
 using RockPaperScissorsGame.Server.Models.Db;
+using RockPaperScissorsGame.Server.Options;
+using RockPaperScissorsGame.Server.Services.Abstractions;
 
-namespace RockPaperScissorsGame.Server.Services
+namespace RockPaperScissorsGame.Server.Services.Implementations
 {
     public class UsersService : IUsersService
     {

@@ -1,10 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
+using System.Linq;
+using System.Threading.Tasks;
 using RockPaperScissorsGame.Server.Models;
+using RockPaperScissorsGame.Server.Services.Abstractions;
 
-namespace RockPaperScissorsGame.Server.Services
+namespace RockPaperScissorsGame.Server.Services.Implementations
 {
     public class Storage<T>: IStorage<T> where T : class
     {

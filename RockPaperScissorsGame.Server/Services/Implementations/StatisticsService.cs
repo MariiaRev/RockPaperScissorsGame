@@ -2,14 +2,19 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using RockPaperScissorsGame.Server.Models;
-using RockPaperScissorsGame.Server.Helpers;
-using RockPaperScissorsGame.Server.Options;
-using RockPaperScissorsGame.Server.Models.Db;
 
-namespace RockPaperScissorsGame.Server.Services
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using RockPaperScissorsGame.Common;
+using RockPaperScissorsGame.Server.Helpers;
+using RockPaperScissorsGame.Server.Models;
+using RockPaperScissorsGame.Server.Models.Db;
+using RockPaperScissorsGame.Server.Models.Game;
+using RockPaperScissorsGame.Server.Options;
+using RockPaperScissorsGame.Server.Services.Abstractions;
+
+namespace RockPaperScissorsGame.Server.Services.Implementations
 {
     public class StatisticsService : IStatisticsService
     {
@@ -72,6 +77,7 @@ namespace RockPaperScissorsGame.Server.Services
 
             return true;
         }
+
 
         /// <summary>
         /// Setup statistics storage with data from the json file database.

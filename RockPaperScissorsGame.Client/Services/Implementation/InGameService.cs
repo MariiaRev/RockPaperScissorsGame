@@ -35,13 +35,13 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
             _isConnectionConfigured = true;
             return true;
         }
-        public async Task MakeMoveAsync(string playerId, Figure figure, bool isMoveMadeInTime)
+        public async Task MakeMoveAsync(string playerId, MoveOptions figure, bool isMoveMadeInTime)
         {
             if (await EnsureConnectionConfigured(playerId))
             {
                 if (!isMoveMadeInTime)
                 {
-                    await _connectionService.Connection.InvokeAsync("MakeMove", Figure.Undefined.ToString());
+                    await _connectionService.Connection.InvokeAsync("MakeMove", MoveOptions.Undefined.ToString());
                     return;
                 }
                 

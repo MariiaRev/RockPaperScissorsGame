@@ -1,6 +1,6 @@
 ﻿namespace RockPaperScissorsGame.Common
 {
-    public enum Figure
+    public enum MoveOptions
     {
         Undefined = 0,
         Rock = 1,

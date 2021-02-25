@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
+using RockPaperScissorsGame.Common;
 using RockPaperScissorsGame.Server.Models;
+using RockPaperScissorsGame.Server.Models.Game;
 
-namespace RockPaperScissorsGame.Server.Services
+namespace RockPaperScissorsGame.Server.Services.Abstractions
 {
     public interface IStatisticsService
     {

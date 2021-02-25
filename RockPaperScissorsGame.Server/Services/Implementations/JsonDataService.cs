@@ -1,11 +1,11 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace RockPaperScissorsGame.Server.Services
+namespace RockPaperScissorsGame.Server.Services.Implementations
 {
     public class JsonDataService<T> where T: class
     {

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace RockPaperScissorsGame.Server.Services
+namespace RockPaperScissorsGame.Server.Services.Abstractions
 {
     public interface IUsersService
     {

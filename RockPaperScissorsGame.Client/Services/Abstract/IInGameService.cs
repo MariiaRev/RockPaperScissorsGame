@@ -5,7 +5,7 @@ namespace RockPaperScissorsGame.Client.Services.Abstract
 {
     public interface IInGameService
     {
-        Task MakeMoveAsync(string playerId, Figure figure, bool isMoveMadeInTime);
+        Task MakeMoveAsync(string playerId, MoveOptions figure, bool isMoveMadeInTime);
         Task LeaveGameAsync(string playerId);
     }
 }

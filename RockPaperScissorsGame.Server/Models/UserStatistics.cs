@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using RockPaperScissorsGame.Common;
+using RockPaperScissorsGame.Server.Models.Game;
 
 namespace RockPaperScissorsGame.Server.Models
 {
