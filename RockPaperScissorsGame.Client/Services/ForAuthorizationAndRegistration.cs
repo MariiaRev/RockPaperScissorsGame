@@ -5,7 +5,7 @@ using System.Net.Http;
 using RockPaperScissorsGame.Client.Options;
 using System.Threading.Tasks;
 
-namespace RockPaperScissorsGame.Client
+namespace RockPaperScissorsGame.Client.Services
 {
     /// <summary>
     /// Methods from here send requests to the server, receive responses and return responses content.
@@ -28,7 +28,7 @@ namespace RockPaperScissorsGame.Client
         /// String authorization token if user was authorized.
         /// Null if user was not authorized (for example, because of wrong login or password).
         /// </returns>
-        public async Task<string> Authorize(string login, string password)      //login request
+        public async Task<string> AuthorizeAsync(string login, string password)      //login request
         {
             var requestMessage = GetRequestMessage(
                 HttpMethod.Post, "login", 
@@ -57,7 +57,7 @@ namespace RockPaperScissorsGame.Client
         ///Returns true with success message if user was registered.
         ///Returns false with error message if user was not registered (for example, because <paramref name="login"/> already exists).
         /// </returns>
-        public async Task<(bool, string)> Register(string login, string password)   // registration request
+        public async Task<(bool, string)> RegisterAsync(string login, string password)   // registration request
         {
             var requestMessage = GetRequestMessage(
                 HttpMethod.Post, "registration", 
