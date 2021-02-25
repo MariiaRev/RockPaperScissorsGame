@@ -32,8 +32,8 @@ namespace RockPaperScissorsGame.Server.Hubs
 
         public async Task<string> CreatePrivateRoom()
         {
-            //string userId = GetUserToken();
-            string userId = Context.ConnectionId;
+            string userId = GetUserToken();
+            //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Private room creation requested");
 
@@ -61,8 +61,8 @@ namespace RockPaperScissorsGame.Server.Hubs
         
         public async Task<string> FindPublicRoom()
         {
-            //string userId = GetUserToken();
-            string userId = Context.ConnectionId;
+            string userId = GetUserToken();
+            //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Search for public room requested");
 
@@ -97,8 +97,8 @@ namespace RockPaperScissorsGame.Server.Hubs
         
         private async Task<string> CreatePublicRoom()
         {
-            //string userId = GetUserToken();
-            string userId = Context.ConnectionId;
+            string userId = GetUserToken();
+            //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Public room creation called");
 
@@ -125,8 +125,8 @@ namespace RockPaperScissorsGame.Server.Hubs
         
         public async Task<string> JoinPrivateRoom(string roomToken)
         {
-            //string userId = GetUserToken();
-            string userId = Context.ConnectionId;
+            string userId = GetUserToken();
+            //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Private room joining was requested");
 
@@ -161,8 +161,8 @@ namespace RockPaperScissorsGame.Server.Hubs
 
         public async Task<string> MakeMove(string choice)
         {
-            //string userId = GetUserToken();
-            string userId = Context.ConnectionId;
+            string userId = GetUserToken();
+            //string userId = Context.ConnectionId;
 
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Move processing was requested");
 
@@ -266,8 +266,8 @@ namespace RockPaperScissorsGame.Server.Hubs
 
         public async Task<string> LeaveGame()
         {
-            //string userId = GetUserToken();
-            string userId = Context.ConnectionId;
+            string userId = GetUserToken();
+            //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Game disconnecting was requested");
 

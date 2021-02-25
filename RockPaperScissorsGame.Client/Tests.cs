@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using RockPaperScissorsGame.Client.Options;
 using RockPaperScissorsGame.Client.Services;
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,7 @@ using System.Diagnostics;
 using System.Net.Http;
 
 using System.Threading.Tasks;
+using RockPaperScissorsGame.Client.Settings;
 
 namespace RockPaperScissorsGame.Client
 {
@@ -19,7 +19,7 @@ namespace RockPaperScissorsGame.Client
         public Tests(
             ForAuthorizationAndRegistration authAndRegistrationService, 
             HttpClient client,
-            IOptions<ClientOptions> options,
+            IOptions<ClientSettings> options,
             UserInteractions userInteractions)
         {
             _authAndRegistrationService = authAndRegistrationService;

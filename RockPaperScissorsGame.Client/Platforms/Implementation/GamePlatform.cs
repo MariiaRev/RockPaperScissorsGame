@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
+
 using RockPaperScissorsGame.Client.Exceptions;
 using RockPaperScissorsGame.Client.Platforms.Abstract;
 using RockPaperScissorsGame.Client.Platforms.Base;
@@ -15,14 +16,14 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         private readonly IGameService _gameService;
         private readonly IInGamePlatform _inGamePlatform;
         private readonly ILogger<GamePlatform> _logger;
-        private readonly HttpClient _client;
 
-        public GamePlatform(IGameService gameService, IInGamePlatform inGamePlatform, ILogger<GamePlatform> logger/*, HttpClient client*/)
+        public GamePlatform(IGameService gameService, 
+            IInGamePlatform inGamePlatform, 
+            ILogger<GamePlatform> logger)
         {
             _gameService = gameService;
             _inGamePlatform = inGamePlatform;
             _logger = logger;
-            //_client = client;
         }
         
         private async Task FindPublicGame()
@@ -137,8 +138,54 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         
         private async Task PlayWithBot()
         {
-            Console.WriteLine("Unimplemented...");
-            //_client.SendAsync()
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine();
+            Console.WriteLine("1. Rock");
+            Console.WriteLine("2. Paper"); 
+            Console.WriteLine("3. Scissors");
+            Console.ResetColor();
+
+            MoveOptions figure;
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write("Choose your figure: ");
+                Console.ResetColor();
+                
+                string userInput = Console.ReadLine();
+                
+                if (string.IsNullOrEmpty(userInput))
+                {
+                    Console.WriteLine("Empty input. Try again\n");
+                    continue;
+                }
+
+                if (Enum.TryParse(userInput, out figure) == false)
+                {
+                    Console.WriteLine("Unknown figure. Try again\n");
+                    continue;
+                }
+                
+                break;
+            }
+
+            try
+            {
+                string roundResult = await _gameService.PlayRoundWithBot(PlayerId, figure);
+                Console.WriteLine(roundResult);
+            }
+            catch (Exception exception)
+            {
+                if (exception is ConnectionException ||
+                    exception is ServiceException)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
         
         private void Exit()

@@ -1,6 +1,6 @@
-﻿namespace RockPaperScissorsGame.Client.Options
+﻿namespace RockPaperScissorsGame.Client.Settings
 {
-    public class UserInfoOptions
+    public class UserInfoSettings
     {
         public uint LoginMinLength { get; set; }
         public uint PasswordMinLength { get; set; }

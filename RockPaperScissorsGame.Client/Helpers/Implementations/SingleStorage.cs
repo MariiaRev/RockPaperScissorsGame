@@ -1,4 +1,6 @@
-﻿namespace RockPaperScissorsGame.Client.Services
+﻿using RockPaperScissorsGame.Client.Helpers.Abstract;
+
+namespace RockPaperScissorsGame.Client.Helpers.Implementations
 {
     public class SingleStorage<T> : ISingleStorage<T>
     {

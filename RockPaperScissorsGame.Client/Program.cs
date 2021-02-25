@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RockPaperScissorsGame.Client.Helpers.Abstract;
+using RockPaperScissorsGame.Client.Helpers.Implementations;
 using Serilog;
 
 using RockPaperScissorsGame.Client.Platforms.Abstract;
@@ -11,7 +13,6 @@ using RockPaperScissorsGame.Client.Platforms.Implementation;
 using RockPaperScissorsGame.Client.Services.Abstract;
 using RockPaperScissorsGame.Client.Services.Implementation;
 using RockPaperScissorsGame.Client.Settings;
-using RockPaperScissorsGame.Client.Options;
 using RockPaperScissorsGame.Client.Services;
 
 namespace RockPaperScissorsGame.Client
@@ -28,26 +29,34 @@ namespace RockPaperScissorsGame.Client
                     .Build();
 
                 var serviceProvider = new ServiceCollection()
+                    .AddSingleton<IMainPlatform, MainPlatform>()
                     .AddSingleton<IGamePlatform, GamePlatform>()
                     .AddSingleton<IInGamePlatform, InGamePlatform>()
                     .AddSingleton<IConnectionService, ConnectionService>()
                     .AddSingleton<IGameService, GameService>()
                     .AddSingleton<IInGameService, InGameService>()
-                    .AddSingleton<Tests>()
-                    .AddSingleton<ForAuthorizationAndRegistration>()
-                    .AddSingleton<UserInteractions>()
+                    .AddSingleton<ISigningService, SigningService>()
                     .AddSingleton<IUserInput, UserInput>()
                     .AddSingleton(typeof(ISingleStorage<>), typeof(SingleStorage<>))
-                    .Configure<ClientOptions>(configuration.GetSection("ClientSettings"))
-                    .Configure<UserInfoOptions>(configuration.GetSection("UserInfoSettings"))
+                    //.AddSingleton<ForAuthorizationAndRegistration>()
+                    //.AddSingleton<UserInteractions>()
+                    
+                    .Configure<ClientSettings>(configuration.GetSection("ClientSettings"))
+                    .Configure<UserInfoSettings>(configuration.GetSection("UserInfoSettings"))
                     .Configure<AppSettings>(configuration.GetSection("App"))
+                    
                     .AddHttpClient()
+                    
                     .AddLogging(builder => builder.AddSerilog(
                         new LoggerConfiguration()
                             .WriteTo.File("Logs/client.log")
                             .CreateLogger()))
+                    
                     .BuildServiceProvider();
 
+                var mainPlatform = serviceProvider.GetRequiredService<IMainPlatform>();
+                await mainPlatform.StartAsync(null);
+                
                 //await serviceProvider.GetRequiredService<Tests>().RunAsync();
                 // var gamePlatform = serviceProvider.GetRequiredService<IGamePlatform>();
                 //await gamePlatform.StartAsync("X-PLAYER_ID");

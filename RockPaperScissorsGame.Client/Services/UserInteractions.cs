@@ -2,14 +2,15 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using RockPaperScissorsGame.Client.Options;
+using RockPaperScissorsGame.Client.Helpers.Abstract;
+using RockPaperScissorsGame.Client.Settings;
 
 namespace RockPaperScissorsGame.Client.Services
 {
     public class UserInteractions
     {
         private readonly IUserInput _userInputService;
-        private readonly UserInfoOptions _options;
+        private readonly UserInfoSettings _options;
         private readonly ForAuthorizationAndRegistration _authRegistrationService;
         private readonly ISingleStorage<string> _authToken;
 
@@ -18,7 +19,7 @@ namespace RockPaperScissorsGame.Client.Services
 
         public UserInteractions(
             IUserInput userInputService,
-            IOptions<UserInfoOptions> options,
+            IOptions<UserInfoSettings> options,
             ForAuthorizationAndRegistration authRegistrationService,
             ISingleStorage<string> authToken)
         {
@@ -30,8 +31,8 @@ namespace RockPaperScissorsGame.Client.Services
 
         /// <summary>
         /// Interactions with user for authorization.
-        /// Blocks authorization after <see cref="UserInfoOptions.AuthorizationAttemptsMax"/> unsuccessfull 
-        /// authorization attempts for <see cref="UserInfoOptions.AuthorizationBlockingTime"/> seconds.
+        /// Blocks authorization after <see cref="UserInfoSettings.AuthorizationAttemptsMax"/> unsuccessfull 
+        /// authorization attempts for <see cref="UserInfoSettings.AuthorizationBlockingTime"/> seconds.
         /// </summary>
         /// <returns>
         /// True if user was authorized.

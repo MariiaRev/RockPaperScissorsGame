@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RockPaperScissorsGame.Client.Services
+﻿namespace RockPaperScissorsGame.Client.Helpers.Abstract
 {
     public interface IUserInput
     {

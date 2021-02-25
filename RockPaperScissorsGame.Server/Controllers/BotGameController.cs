@@ -2,6 +2,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using RockPaperScissorsGame.Common;
 using RockPaperScissorsGame.Server.Models.Game;
 using RockPaperScissorsGame.Server.Services.Abstractions;
@@ -39,7 +40,13 @@ namespace RockPaperScissorsGame.Server.Controllers
             GameOutcome roundResult = _gameService.GetGameResult(userFigure, botMoveOption);
             
             _logger.LogInformation($"{nameof(BotGameController)}: round with bot ended");
-            return new OfflineRound(Request.Headers["X-UserId"], userFigure, botMoveOption, roundResult);
+            bool doesRequestHaveUserId = Request.Headers.TryGetValue("X-userId", out StringValues rawUserId);
+            string userId = string.Empty;
+            if (doesRequestHaveUserId)
+            {
+                userId = rawUserId;
+            }
+            return new OfflineRound(userId, userFigure, botMoveOption, roundResult);
         }
     }
 }
