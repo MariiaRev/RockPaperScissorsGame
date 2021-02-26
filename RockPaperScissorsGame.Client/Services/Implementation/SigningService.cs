@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RockPaperScissorsGame.Client.Exceptions;
 using RockPaperScissorsGame.Client.Services.Abstract;
@@ -12,10 +13,12 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
     public class SigningService : ISigningService
     {
         private readonly HttpClient _client;
+        private readonly ILogger<SigningService> _logger;
 
-        public SigningService(HttpClient client, IOptions<ClientSettings> options)
+        public SigningService(HttpClient client, IOptions<ClientSettings> options, ILogger<SigningService> logger)
         {
             _client = client;
+            _logger = logger;
             _client.BaseAddress = new Uri(options.Value.BaseAddress);
         }
         
@@ -49,6 +52,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
             }
             catch (HttpRequestException)
             {
+                _logger.LogError($"{nameof(SigningService)}: Unable to connect to the server.");
                 throw new ConnectionException("Unable to connect to the server. Please, try again later");
             }
             
@@ -86,6 +90,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
             }
             catch (HttpRequestException)
             {
+                _logger.LogError($"{nameof(SigningService)}: Unable to connect to the server.");
                 throw new ConnectionException("Unable to connect to the server. Please, try again later");
             }
         }

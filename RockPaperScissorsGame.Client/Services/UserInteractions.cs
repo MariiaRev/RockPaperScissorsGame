@@ -43,7 +43,7 @@ namespace RockPaperScissorsGame.Client.Services
             // check if authorization is blocked
             if (IsBlocked())
             {
-                Console.WriteLine($"\n\nAuthorization is still blocked. Please, try again later.");
+                Console.WriteLine("\nAuthorization is still blocked. Please, try again later.");
                 return false;
             }
 
@@ -62,12 +62,12 @@ namespace RockPaperScissorsGame.Client.Services
                     // if user was not authorized
                     if (authToken == null)
                     {
-                        Console.WriteLine("\n\nWrong login or password.");
+                        Console.WriteLine("\nWrong login or password.");
                         
                         if (_authorizationAttempts >= _options.AuthorizationAttemptsMax)
                         {
                             //block authorization for a while
-                            Console.WriteLine($"\n\nYou used maximum ({_options.AuthorizationAttemptsMax}) authorization attempts.");
+                            Console.WriteLine($"\nYou used maximum ({_options.AuthorizationAttemptsMax}) authorization attempts.");
                             Console.WriteLine($"Authorization is blocked for {_options.AuthorizationBlockingTime} seconds.");
                             _authBlockedAt = DateTime.Now;
                             return false;
@@ -76,7 +76,7 @@ namespace RockPaperScissorsGame.Client.Services
                         {
                             // try again or exit
                             var exitWord = "exit";
-                            var message = $"Enter anything to retry authorization or enter '{exitWord}' to exit to the previous menu:";
+                            var message = $"Enter anything to retry authorization or enter '{exitWord}' to exit to the previous menu: ";
                             
                             // if user entered anything but not the exit-word
                             if (!_userInputService.ReadString(message, exitWord, true))
@@ -116,7 +116,7 @@ namespace RockPaperScissorsGame.Client.Services
                 try
                 {
                     (var success, var message ) = await _authRegistrationService.RegisterAsync(login, password);
-                    Console.WriteLine($"\n\n{message}");
+                    Console.WriteLine($"\n{message}");
                 }
                 catch (Exception e)
                 {
@@ -138,23 +138,23 @@ namespace RockPaperScissorsGame.Client.Services
         private (string, string) AcceptLoginPassword()
         {
             var exitWord = "exit";
-            var message = "\n\nEnter your login, please:";
-            var tryAgainMessage = $"\n\nLogin should contain at least {_options.LoginMinLength} character(s). Try again or enter {exitWord} to exit:";
+            var message = "\nEnter your login, please: ";
+            var tryAgainMessage = $"\nLogin should contain at least {_options.LoginMinLength} character(s). Try again or enter {exitWord} to exit: ";
             var login = _userInputService.ReadString(message, tryAgainMessage, _options.LoginMinLength, exitWord);
 
             if (login == null)
             {
-                Console.WriteLine("\n\nAuthorization is canceled.");
+                Console.WriteLine("\nAuthorization is canceled.");
                 return (null, null);
             }
 
-            message = "\n\nEnter your password, please:";
-            tryAgainMessage = $"\n\nPassword should contain at least {_options.PasswordMinLength} character(s). Try again or enter {exitWord} to exit:";
+            message = "\nEnter your password, please: ";
+            tryAgainMessage = $"\nPassword should contain at least {_options.PasswordMinLength} character(s). Try again or enter {exitWord} to exit: ";
             var password = _userInputService.ReadString(message, tryAgainMessage, _options.PasswordMinLength, exitWord);
 
             if (password == null)
             {
-                Console.WriteLine("\n\nAuthorization is canceled.");
+                Console.WriteLine("\nAuthorization is canceled.");
                 return (null, null);
             }
 

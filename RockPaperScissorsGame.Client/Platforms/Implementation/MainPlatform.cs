@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using RockPaperScissorsGame.Client.Exceptions;
@@ -19,7 +19,8 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         private readonly ISigningService _signingService;
         private readonly ISingleStorage<string> _authToken;
         private readonly IGamePlatform _gamePlatform;
-        
+        private readonly ILogger<MainPlatform> _logger;
+
         private int _authorizationAttempts;
         private DateTime? _authBlockedAt;
         
@@ -28,13 +29,15 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             IOptions<UserInfoSettings> options,
             ISigningService signingService,
             ISingleStorage<string> authToken, 
-            IGamePlatform gamePlatform)
+            IGamePlatform gamePlatform,
+            ILogger<MainPlatform> logger)
         {
             _userInputService = userInputService;
             _options = options.Value;
             _signingService = signingService;
             _authToken = authToken;
             _gamePlatform = gamePlatform;
+            _logger = logger;
         }
         
         /// <summary>
@@ -48,10 +51,14 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         /// </returns>
         private async Task AuthorizeUserAsync()
         {    
+            _logger.LogInformation($"{nameof(MainPlatform)}: Authorization begins");
+
             // check if authorization is blocked
             if (IsBlocked())
             {
-                Console.WriteLine($"\n\nAuthorization is still blocked. Please, try again later.");
+                Console.WriteLine("\nAuthorization is still blocked. Please, try again later.");
+                _logger.LogInformation($"{nameof(MainPlatform)}: Authorization is blocked");
+
                 return;
             }
 
@@ -76,20 +83,23 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 // if user was not authorized
                 if (authToken == null)
                 {
-                    Console.WriteLine("\n\nWrong login or password.");
+                    Console.WriteLine("\nWrong login or password.");
                         
                     if (_authorizationAttempts >= _options.AuthorizationAttemptsMax)
                     {
                         //block authorization for a while
-                        Console.WriteLine($"\n\nYou used maximum ({_options.AuthorizationAttemptsMax}) authorization attempts.");
+                        Console.WriteLine($"\nYou used maximum ({_options.AuthorizationAttemptsMax}) authorization attempts.");
                         Console.WriteLine($"Authorization is blocked for {_options.AuthorizationBlockingTime} seconds.");
+                        _logger.LogInformation($"{nameof(MainPlatform)}: User made ({_options.AuthorizationAttemptsMax}) unsuccessful authorization attempts. " +
+                                               $"Authorization is blocked for {_options.AuthorizationBlockingTime} seconds.");
+
                         _authBlockedAt = DateTime.Now;
                         return;
                     }
                         
                     // try again or exit
                     var exitWord = "exit";
-                    var message = $"Enter anything to retry authorization or enter '{exitWord}' to exit to the previous menu:";
+                    var message = $"Enter anything to retry authorization or enter '{exitWord}' to exit to the previous menu: ";
                             
                     // if user entered anything but not the exit-word
                     if (!_userInputService.ReadString(message, exitWord, true))
@@ -104,7 +114,8 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 // if user was authorized update his/her auth token
                 _authToken.Update(authToken);
                 Console.WriteLine("You are successfully authorized.");
-                    
+                _logger.LogInformation($"{nameof(MainPlatform)}: Authorization ended successfully");
+
                 await _gamePlatform.StartAsync(authToken); // move to the next menu
             }
         }
@@ -134,6 +145,8 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         /// <returns>Returns no value.</returns>
         private async Task RegisterUserAsync()
         {
+            _logger.LogInformation($"{nameof(MainPlatform)}: Registration begins");
+
             (var login, var password) = AcceptLoginPassword();
 
             if (login != null && password != null)
@@ -141,15 +154,9 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 try
                 {
                     (var success, var message ) = await _signingService.RegisterAsync(login, password);
-                    Console.WriteLine($"\n\n{message}");
-                    /*if (success)
-                    {
-                        Console.WriteLine($"User '{login}' was successfully registered");
-                    }
-                    else
-                    {                        
-                        Console.WriteLine("Error occured during the registration process. Please, try again later");
-                    }*/
+                    Console.WriteLine($"\n{message}");
+                    _logger.LogInformation($"{nameof(MainPlatform)}: Registration ended. {message}");
+
                 }
                 catch (ConnectionException exception)
                 {
@@ -161,23 +168,23 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         private (string, string) AcceptLoginPassword()
         {
             var exitWord = "exit";
-            var message = "\n\nEnter your login, please:";
-            var tryAgainMessage = $"\n\nLogin should contain at least {_options.LoginMinLength} character(s). Try again or enter {exitWord} to exit:";
+            var message = "\nEnter your login, please: ";
+            var tryAgainMessage = $"\nLogin should contain at least {_options.LoginMinLength} character(s). Try again or enter {exitWord} to exit: ";
             var login = _userInputService.ReadString(message, tryAgainMessage, _options.LoginMinLength, exitWord);
 
             if (login == null)
             {
-                Console.WriteLine("\n\nAuthorization is canceled.");
+                Console.WriteLine("\nAuthorization is canceled.");
                 return (null, null);
             }
 
-            message = "\n\nEnter your password, please:";
-            tryAgainMessage = $"\n\nPassword should contain at least {_options.PasswordMinLength} character(s). Try again or enter {exitWord} to exit:";
+            message = "\nEnter your password, please: ";
+            tryAgainMessage = $"\nPassword should contain at least {_options.PasswordMinLength} character(s). Try again or enter {exitWord} to exit: ";
             var password = _userInputService.ReadString(message, tryAgainMessage, _options.PasswordMinLength, exitWord);
 
             if (password == null)
             {
-                Console.WriteLine("\n\nAuthorization is canceled.");
+                Console.WriteLine("\nAuthorization is canceled.");
                 return (null, null);
             }
 
@@ -186,6 +193,8 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         
         private async Task ShowLeaderboardAsync()
         {
+            _logger.LogInformation($"{nameof(MainPlatform)}: User requested leaderboard");
+
             //todo
             Console.WriteLine("TODO");
         }

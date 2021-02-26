@@ -115,6 +115,12 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 {
                     break;
                 }
+
+                if (!KeepProgramActive)
+                {
+                    await timer.DisposeAsync();
+                    return;
+                }
                 
                 if (string.IsNullOrEmpty(userInput))
                 {

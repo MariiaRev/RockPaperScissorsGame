@@ -117,7 +117,7 @@ namespace RockPaperScissorsGame.Server.Hubs
             if (isSuccess)
             {
                 _logger.LogInformation($"{nameof(GameHub)} | {userId}: Public room created");
-                string welcomingMessage = "Waiting for the opponent...";
+                string welcomingMessage = "Waiting for the opponent...\nSearching time: 30 seconds";
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomToken);
                 await SendMessageToCaller(welcomingMessage);
                 

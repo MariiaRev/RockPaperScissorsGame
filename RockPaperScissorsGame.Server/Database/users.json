@@ -28,5 +28,10 @@
     "userId": 6,
     "login": "abcd1",
     "password": "111111"
+  },
+  {
+    "userId": 7,
+    "login": "abcd2",
+    "password": "111111"
   }
 ]

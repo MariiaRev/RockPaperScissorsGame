@@ -7,7 +7,7 @@ namespace RockPaperScissorsGame.Client.Helpers.Implementations
     {
         public string ReadString(string message, string tryAgainMessage, uint minLength, string exitWord = null)
         {
-            Console.WriteLine(message);
+            Console.Write(message);
             var userInput = Console.ReadLine()?.Trim();
 
             while (userInput?.Length < minLength)

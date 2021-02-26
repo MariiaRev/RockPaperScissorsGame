@@ -29,7 +29,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         private async Task FindPublicGame()
         {
             _logger.LogInformation($"{nameof(GamePlatform)}: Start finding of public room");
-            Console.WriteLine("\nFinding opponent...");
+            Console.WriteLine("\nLooking for opponent...");
             try
             {
                 string resultEvent = await _gameService.FindPublicGame(PlayerId);
@@ -173,7 +173,9 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             try
             {
                 string roundResult = await _gameService.PlayRoundWithBot(PlayerId, figure);
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(roundResult);
+                Console.ResetColor();
             }
             catch (Exception exception)
             {
@@ -191,12 +193,15 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         
         private async Task ShowPersonalStatisticsAsync()
         {
+            _logger.LogInformation($"{nameof(GamePlatform)}: User requested personal statistics");
             //todo
             Console.WriteLine("TODO");
         }
         
         private async Task ShowLeaderboardAsync()
         {
+            _logger.LogInformation($"{nameof(GamePlatform)}: User requested leaderboard");
+
             //todo
             Console.WriteLine("TODO");
         }

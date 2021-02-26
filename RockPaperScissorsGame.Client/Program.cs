@@ -63,7 +63,7 @@ namespace RockPaperScissorsGame.Client
             }
             catch (FileNotFoundException e)
             {
-                Console.WriteLine($"{e.Message}\n\n\n");
+                Console.WriteLine($"{e.Message}\n\n");
             }
         }
     }
