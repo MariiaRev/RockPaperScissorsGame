@@ -15,7 +15,7 @@ namespace RockPaperScissorsGame.Client.Services
         private readonly UserInfoOptions _options;
         private readonly ForAuthorizationAndRegistration _authRegistration;
         private readonly RequestsForStatistics _requestsForStatistics;
-        private readonly ISingleStorage<AuthToken> _authToken;
+        private readonly ISingleStorage<AuthInfo> _authInfo;
 
         private int _authorizationAttempts = 0;
         private DateTime? _authBlockedAt = null;
@@ -25,13 +25,13 @@ namespace RockPaperScissorsGame.Client.Services
             IOptions<UserInfoOptions> options,
             ForAuthorizationAndRegistration authRegistration,
             RequestsForStatistics requestsForStatistics,
-            ISingleStorage<AuthToken> authToken)
+            ISingleStorage<AuthInfo> authInfo)
         {
             _userInput = userInput;
             _options = options.Value;
             _authRegistration = authRegistration;
             _requestsForStatistics = requestsForStatistics;
-            _authToken = authToken;
+            _authInfo = authInfo;
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace RockPaperScissorsGame.Client.Services
                     }
 
                     // if user was authorized update his/her auth token
-                    await _authToken.UpdateAsync(new AuthToken(authToken));
+                    await _authInfo.UpdateAsync(new AuthInfo(authToken));
                     Console.WriteLine("\nYou are succesfully authorized.");
                     return true;
                 }
@@ -132,7 +132,15 @@ namespace RockPaperScissorsGame.Client.Services
 
         public async Task ShowLeaderboardAsync()
         {
-            // ask to send request
+            // if user is authorized save his/her in-game time
+            var authInfo = _authInfo.Get();
+            if (authInfo != null && authInfo?.Token != null)
+            {
+                // ask to send request to save user in-game time
+                await _requestsForStatistics.SaveUserGameTime();
+            }
+
+            // ask to send request for statistics
             (var success, var content) = await _requestsForStatistics.GetLeaderboardAsync();
 
             if (success)
@@ -151,14 +159,14 @@ namespace RockPaperScissorsGame.Client.Services
                     }
 
                     Console.WriteLine("-----------------------------------------------------------------");
-                    return;
                 }
                 catch (JsonSerializationException)
                 {
                     Console.WriteLine($"\n\nWe're sorry, an error occured. Statistics is temporarily unavailable.");
                     //logger log serialization error
-                    return;
                 }
+
+                return;
             }
 
             // if no statistics
@@ -167,36 +175,40 @@ namespace RockPaperScissorsGame.Client.Services
 
         public async Task ShowUserStatisticsAsync()
         {
-            try
-            {
-                // ask to send request
-                (var success, var content) = await _requestsForStatistics.GetUserStatisticsAsync();
-
-                if (success)
-                {
-                    try
-                    {
-                        // try deserialise json string (content) into list of UserStatistics
-                        var statistics = JsonConvert.DeserializeObject<UserStatistics>(content);
-                        Console.WriteLine($"\n\n{" ", 4}$$$ Your statistics $$$\n\n{statistics}");
-                        Console.WriteLine("-----------------------------------------------------------------");
-                        return;
-                    }
-                    catch (JsonSerializationException)
-                    {
-                        Console.WriteLine($"\n\nWe're sorry, an error occured. Statistics is temporarily unavailable.");
-                        //logger log serialization error
-                        return;
-                    }
-                }
-
-                // if no statistics
-                Console.WriteLine($"\n\n{content}");
-            }
-            catch(ArgumentNullException)
+            var authInfo = _authInfo.Get();
+            if (authInfo == null || authInfo?.Token == null)
             {
                 Console.WriteLine("\n\nPlease, authorize before viewing personal statistics.");
+                return;
             }
+
+            // if user is authorized
+            // ask to send request to save user in-game time
+            await _requestsForStatistics.SaveUserGameTime();
+
+            // ask to send request for statistics
+            (var success, var content) = await _requestsForStatistics.GetUserStatisticsAsync();
+
+            if (success)
+            {
+                try
+                {
+                    // try deserialise json string (content) into list of UserStatistics
+                    var statistics = JsonConvert.DeserializeObject<UserStatistics>(content);
+                    Console.WriteLine($"\n\n{" ", 4}$$$ Your statistics $$$\n\n{statistics}");
+                    Console.WriteLine("-----------------------------------------------------------------");
+                }
+                catch (JsonSerializationException)
+                {
+                    Console.WriteLine($"\n\nWe're sorry, an error occured. Statistics is temporarily unavailable.");
+                    //logger log serialization error
+                }
+
+                return;
+            }
+
+            // if no statistics
+            Console.WriteLine($"\n\n{content}");
         }
 
         private (string, string) AcceptLoginPassword()

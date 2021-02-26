@@ -13,15 +13,15 @@ namespace RockPaperScissorsGame.Client.Services
     public class RequestsForStatistics
     {
         private readonly HttpClient _client;
-        private readonly ISingleStorage<AuthToken> _authToken;
+        private readonly ISingleStorage<AuthInfo> _authInfo;
         public RequestsForStatistics(
             HttpClient client,
             IOptions<ClientOptions> options,
-            ISingleStorage<AuthToken> authToken)
+            ISingleStorage<AuthInfo> authInfo)
         {
             _client = client;
             _client.BaseAddress = new Uri(options.Value.BaseAddress);
-            _authToken = authToken;
+            _authInfo = authInfo;
         }
 
         /// <summary>
@@ -54,10 +54,12 @@ namespace RockPaperScissorsGame.Client.Services
         /// <exception cref="ArgumentNullException">Thrown when unauthorized user tries to get personal statistics.</exception>
         public async Task<(bool, string)> GetUserStatisticsAsync()
         {
-            if (_authToken.Get() == null || _authToken.Get()?.Token == null)
+            var authInfo = _authInfo.Get();
+            if (authInfo == null || authInfo?.Token == null)
             {
-                throw new ArgumentNullException(nameof(_authToken), "Unauthorized user cannot get personal statistics.");
+                throw new ArgumentNullException(nameof(_authInfo), "Unauthorized user cannot get personal statistics.");
             }
+
 
             var requestMessage = GetRequestMessage(HttpMethod.Get, "statistics/user", new StringContent(string.Empty));
             var response = await _client.SendAsync(requestMessage);
@@ -71,6 +73,29 @@ namespace RockPaperScissorsGame.Client.Services
             return (false, content);
         }
 
+        public async Task<bool> SaveUserGameTime()
+        {
+            var authInfo = _authInfo.Get();
+
+            if (authInfo == null || authInfo?.Token == null)
+            {
+                throw new ArgumentNullException(nameof(_authInfo), "Unauthorized user cannot save his/her in-game time.");
+            }
+
+            // get in-game time for now and restart user in-game watch
+            var userGameTime = authInfo.Watch.ElapsedTicks.ToString();
+            authInfo.Watch.Restart();
+
+            var requestMessage = GetRequestMessage(HttpMethod.Post, "/gametime", new StringContent(userGameTime));
+            var response = await _client.SendAsync(requestMessage);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
         private HttpRequestMessage GetRequestMessage(HttpMethod method, string uri, HttpContent content)
         {
             return new HttpRequestMessage()
@@ -79,7 +104,7 @@ namespace RockPaperScissorsGame.Client.Services
                 RequestUri = new Uri(_client.BaseAddress + uri),
                 Headers =
                 {
-                    { "X-AuthToken", _authToken.Get().Token }
+                    { "X-AuthToken", _authInfo.Get().Token }
                 },
                 Content = content
             };

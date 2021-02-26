@@ -42,8 +42,6 @@ namespace RockPaperScissorsGame.Client
             {
                 Console.WriteLine($"{e.Message}\n\n\n");
             }
-
-            // can I get authToken from here?
         }
     }
 }
