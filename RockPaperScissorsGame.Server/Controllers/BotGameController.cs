@@ -1,10 +1,14 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
 using RockPaperScissorsGame.Common;
 using RockPaperScissorsGame.Server.Models.Game;
+using RockPaperScissorsGame.Server.Models.Out;
 using RockPaperScissorsGame.Server.Services.Abstractions;
 
 namespace RockPaperScissorsGame.Server.Controllers
@@ -26,27 +30,43 @@ namespace RockPaperScissorsGame.Server.Controllers
         
         [HttpPost]
         [Route("play")]
-        public ActionResult<OfflineRound> Post([FromBody] string userFigureRaw)
+       // [ProducesResponseType(typeof(RoundWithBotResultOut), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        //[ProducesResponseType(typeof(string), (int)HttpStatusCode.Forbidden)]
+        public  async Task<ActionResult<RoundWithBotResult>>  Post([FromHeader(Name = "X-AuthToken"), Required] string userToken, 
+                                              [FromBody] string userFigureRaw,
+                                              [FromServices] IStorage<string> tokens)
         {
-            _logger.LogInformation($"{nameof(BotGameController)}: round with bot requested");
+            _logger.LogInformation($"{nameof(BotGameController)}: Round with bot requested");
+            var userId = (await tokens.GetAllAsync())
+                         .Where(tk => tk.Item == userToken)
+                         .Select(tk => tk.Id)
+                         .FirstOrDefault();
 
-            bool isCorrectFigure = Enum.TryParse<MoveOptions>(userFigureRaw, true, out MoveOptions userFigure);
-            if (isCorrectFigure == false)
+            if (userId > 0)     //if user was found
             {
-                return BadRequest("Invalid move option");
+                bool isCorrectFigure = Enum.TryParse<MoveOptions>(userFigureRaw, true, out MoveOptions userFigure);
+                if (isCorrectFigure == false)
+                {
+                    return BadRequest("Invalid move option");
+                }
+
+                MoveOptions botMoveOption = _botGameService.MakeRandomChoice();
+                GameOutcome roundResult = _gameService.GetGameResult(userFigure, botMoveOption);
+
+                _logger.LogInformation($"{nameof(BotGameController)}: Round with bot ended");
+
+                RoundWithBotResult result = new RoundWithBotResult()
+                {
+                    UserMoveOption = userFigure,
+                    BotMoveOption = botMoveOption,
+                    RoundResult = roundResult.ToString()
+                };
+                var jsonResult = JsonSerializer.Serialize(result);
+                return Ok(jsonResult);
             }
 
-            MoveOptions botMoveOption = _botGameService.MakeRandomChoice();
-            GameOutcome roundResult = _gameService.GetGameResult(userFigure, botMoveOption);
-            
-            _logger.LogInformation($"{nameof(BotGameController)}: round with bot ended");
-            bool doesRequestHaveUserId = Request.Headers.TryGetValue("X-userId", out StringValues rawUserId);
-            string userId = string.Empty;
-            if (doesRequestHaveUserId)
-            {
-                userId = rawUserId;
-            }
-            return new OfflineRound(userId, userFigure, botMoveOption, roundResult);
+            return StatusCode((int)HttpStatusCode.Forbidden, "Unauthorized access");
         }
     }
 }

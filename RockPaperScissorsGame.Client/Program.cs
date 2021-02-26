@@ -43,7 +43,7 @@ namespace RockPaperScissorsGame.Client
                     
                     .Configure<ClientSettings>(configuration.GetSection("ClientSettings"))
                     .Configure<UserInfoSettings>(configuration.GetSection("UserInfoSettings"))
-                    .Configure<AppSettings>(configuration.GetSection("App"))
+                    .Configure<TimeoutSettings>(configuration.GetSection("App"))
                     
                     .AddHttpClient()
                     

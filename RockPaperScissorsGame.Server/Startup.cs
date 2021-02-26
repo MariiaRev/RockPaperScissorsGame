@@ -30,6 +30,7 @@ namespace RockPaperScissorsGame.Server
                     .AddSingleton(typeof(JsonDataService<>))
                     .AddSingleton<IStatisticsService, StatisticsService>()
                     .AddSingleton<IUsersService, UsersService>()
+                    .AddTransient<IBotGameService, BotGameService>()
                     .Configure<JsonPathsOptions>(Configuration.GetSection("JsonPaths"))
                     .Configure<StatisticsOptions>(Configuration.GetSection("StatisticsSettings"));
             
@@ -59,7 +60,7 @@ namespace RockPaperScissorsGame.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<GameHub>("/gamehuber");
+                endpoints.MapHub<GameHub>("/GameHub");
             });
         }
     }

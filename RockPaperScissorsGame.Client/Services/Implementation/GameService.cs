@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using RockPaperScissorsGame.Client.Exceptions;
-using RockPaperScissorsGame.Client.Models;
 using RockPaperScissorsGame.Client.Services.Abstract;
 using RockPaperScissorsGame.Client.Settings;
 using RockPaperScissorsGame.Common;
@@ -75,9 +77,9 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
         {
             var requestMessage = GetRequestMessage(
                 HttpMethod.Post, 
+                "bot/play",
                 playerId,
-                "/bot/play",
-                new StringContent(moveOption.ToString()));
+                new StringContent(JsonSerializer.Serialize(moveOption.ToString()), Encoding.UTF8, "application/json"));
 
             try
             {
@@ -132,7 +134,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
                 RequestUri = new Uri(_client.BaseAddress + uri),
                 Headers =
                 {
-                    { "X-userId", authToken }
+                    { "X-AuthToken", authToken }
                 },
                 Content = content
             };

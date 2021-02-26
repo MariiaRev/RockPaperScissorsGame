@@ -73,7 +73,8 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             
                 if (resultEvent.Equals(GameEvents.WaitingForPlayerToJoin))
                 {
-                    Console.WriteLine("Warning: If nobody will join this game in next 60 seconds it will be automatically closed");
+                    Console.WriteLine("Warning: If nobody will join this game in next 60 seconds it will be automatically closed\n" +
+                                      "Waiting for the opponent...");
                     _logger.LogInformation($"{nameof(GamePlatform)}: Empty private room is created");
 
                     await _inGamePlatform.StartAsync(60);
@@ -188,6 +189,18 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             }
         }
         
+        private async Task ShowPersonalStatisticsAsync()
+        {
+            //todo
+            Console.WriteLine("TODO");
+        }
+        
+        private async Task ShowLeaderboardAsync()
+        {
+            //todo
+            Console.WriteLine("TODO");
+        }
+        
         private void Exit()
         {
             KeepProgramActive = false;
@@ -210,6 +223,12 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 case 4:
                     await PlayWithBot();
                     break;
+                case 5:
+                    await ShowPersonalStatisticsAsync();
+                    break;
+                case 6:
+                    await ShowLeaderboardAsync();
+                    break;
                 case 0:
                     Exit();
                     break;
@@ -231,6 +250,8 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             Console.WriteLine("2. Create private game");
             Console.WriteLine("3. Join private game");
             Console.WriteLine("4. Play with bot");
+            Console.WriteLine("5. Personal statistics");
+            Console.WriteLine("6. Leaderboard");
             Console.WriteLine("0. Exit");
             
             Console.ResetColor();

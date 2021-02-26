@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
@@ -14,12 +15,12 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
         private bool _isWaiting;
         private bool _isConnectionConfigured;
         private readonly IConnectionService _connectionService;
-        private readonly IOptions<AppSettings> _appSettings;
+        private readonly IOptions<TimeoutSettings> _timeoutSettings;
 
-        public InGameService(IConnectionService connectionService, IOptions<AppSettings> appSettings)
+        public InGameService(IConnectionService connectionService, IOptions<TimeoutSettings> timeoutSettings)
         {
             _connectionService = connectionService;
-            _appSettings = appSettings;
+            _timeoutSettings = timeoutSettings;
         }
 
         private async Task<bool> EnsureConnectionConfigured(string playerId)
@@ -50,7 +51,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
                 {
                     _isWaiting = true;
 
-                    int timeout = _appSettings.Value?.MoveTimeout ?? 20000;
+                    int timeout = _timeoutSettings.Value?.MoveTimeout ?? 20000;
                     int poolingTimeout = 2000;
                     
                     for (int i = 0; i < timeout / poolingTimeout; i++)
@@ -61,11 +62,13 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
                             break;
                         }
                     }
+
+                    if (_isWaiting)
+                    {
+                        Console.WriteLine("You can wait for an opponent or leave the game"); 
+                    }
                 }
-                
-                
             }
-               
         }
         
         public async Task LeaveGameAsync(string playerId)

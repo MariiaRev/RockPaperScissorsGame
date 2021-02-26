@@ -15,11 +15,11 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
     public class ConnectionService : IConnectionService
     {
         public HubConnection Connection { get; private set; }
-        private readonly IOptions<AppSettings> _appSettings;
+        private readonly IOptions<ClientSettings> _clientSettings;
 
-        public ConnectionService(IOptions<AppSettings> appSettings)
+        public ConnectionService(IOptions<ClientSettings> clientSettings)
         {
-            _appSettings = appSettings;
+            _clientSettings = clientSettings;
         }
         
         public async Task<bool> EnsureConnectionAsync(string playerId)
@@ -39,7 +39,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
         
         private async Task ConnectToTheServerAsync(string playerId)
         {
-            string signalRAddress = $"{_appSettings.Value.BaseAddress}/gamehuber?AuthToken={playerId}";
+            string signalRAddress = $"{_clientSettings.Value.BaseAddress}/GameHub?AuthToken={playerId}";
 
             Connection = new HubConnectionBuilder()
                 .WithUrl(signalRAddress)

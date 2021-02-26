@@ -47,7 +47,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
 
                 return null;
             }
-            catch (HttpRequestException exception)
+            catch (HttpRequestException)
             {
                 throw new ConnectionException("Unable to connect to the server. Please, try again later");
             }
@@ -84,7 +84,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
 
                 return (false, responseMessage);
             }
-            catch (HttpRequestException exception)
+            catch (HttpRequestException)
             {
                 throw new ConnectionException("Unable to connect to the server. Please, try again later");
             }

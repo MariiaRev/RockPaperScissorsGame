@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using RockPaperScissorsGame.Common;
+using RockPaperScissorsGame.Server.Models;
 using RockPaperScissorsGame.Server.Models.Game;
 using RockPaperScissorsGame.Server.Services.Abstractions;
 
@@ -14,16 +16,22 @@ namespace RockPaperScissorsGame.Server.Hubs
         private readonly IGameStoringService _gameStorageService;
         private readonly IStatisticsService _statisticsService;
         private readonly ILogger<GameHub> _logger;
+        private readonly IStorage<string> _tokens;
 
-        public GameHub(IGameService gameService, IGameStoringService gameStorage, IStatisticsService statisticsService, ILogger<GameHub> logger)
+        public GameHub(IGameService gameService,
+                IGameStoringService gameStorage, 
+                IStatisticsService statisticsService,
+                ILogger<GameHub> logger,
+                IStorage<string> tokens)
         {
             _gameService = gameService;
             _gameStorageService = gameStorage;
             _statisticsService = statisticsService;
             _logger = logger;
+            _tokens = tokens;
         }
 
-        private string GetUserToken()
+        private string ReadUserToken()
         {
             var httpContext = Context.GetHttpContext();
             var token = httpContext.Request.Query["AuthToken"];
@@ -32,7 +40,7 @@ namespace RockPaperScissorsGame.Server.Hubs
 
         public async Task<string> CreatePrivateRoom()
         {
-            string userId = GetUserToken();
+            string userId = ReadUserToken();
             //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Private room creation requested");
@@ -61,7 +69,7 @@ namespace RockPaperScissorsGame.Server.Hubs
         
         public async Task<string> FindPublicRoom()
         {
-            string userId = GetUserToken();
+            string userId = ReadUserToken();
             //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Search for public room requested");
@@ -97,7 +105,7 @@ namespace RockPaperScissorsGame.Server.Hubs
         
         private async Task<string> CreatePublicRoom()
         {
-            string userId = GetUserToken();
+            string userId = ReadUserToken();
             //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Public room creation called");
@@ -125,7 +133,7 @@ namespace RockPaperScissorsGame.Server.Hubs
         
         public async Task<string> JoinPrivateRoom(string roomToken)
         {
-            string userId = GetUserToken();
+            string userId = ReadUserToken();
             //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Private room joining was requested");
@@ -161,7 +169,7 @@ namespace RockPaperScissorsGame.Server.Hubs
 
         public async Task<string> MakeMove(string choice)
         {
-            string userId = GetUserToken();
+            string userId = ReadUserToken();
             //string userId = Context.ConnectionId;
 
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Move processing was requested");
@@ -224,6 +232,33 @@ namespace RockPaperScissorsGame.Server.Hubs
 
             if (currentRound.Opponent(userId).SelectedOption.HasValue && currentRound.Player(userId).SelectedOption.HasValue)
             {
+
+                ItemWithId<string> playerActiveToken = (await _tokens.GetAllAsync()).FirstOrDefault(tk => tk.Item == currentRound.Player(userId).PlayerId);
+                ItemWithId<string> opponentActiveToken = (await _tokens.GetAllAsync()).FirstOrDefault(tk => tk.Item == currentRound.Opponent(userId).PlayerId);
+
+                if (playerActiveToken == null)
+                {
+                    _logger.LogInformation($"{nameof(GameHub)}: Unauthorized user tried to make move");
+                    currentRound.CreateNewRound();
+                    await Clients.Caller.SendAsync(GameEvents.GameEnd,
+                        "Your access token is expired. You are not allowed to make moves in any game.\nTry to login again");
+                    await Clients.OthersInGroup(currentRoom.RoomToken).SendAsync(GameEvents.GameEnd, 
+                        "Your opponent disconnected");
+                    
+                    return GameEvents.GameEnd;
+                } 
+                if (opponentActiveToken == null)
+                {
+                    _logger.LogInformation($"{nameof(GameHub)}: Unauthorized user tried to make move");
+                    currentRound.CreateNewRound();
+                    await Clients.OthersInGroup(currentRoom.RoomToken).SendAsync(GameEvents.GameEnd, 
+                        "Your access token is expired. You are not allowed to make moves in any game.\nTry to login again");
+                    await Clients.Caller.SendAsync(GameEvents.GameEnd, 
+                        "Your opponent disconnected");
+                    
+                    return GameEvents.GameEnd;
+                }
+                
                 //var playerMoveOption = currentRound.Player(userId).SelectedOption.Value;
                 var opponentMoveOption = currentRound.Opponent(userId).SelectedOption.Value;
             
@@ -266,7 +301,7 @@ namespace RockPaperScissorsGame.Server.Hubs
 
         public async Task<string> LeaveGame()
         {
-            string userId = GetUserToken();
+            string userId = ReadUserToken();
             //string userId = Context.ConnectionId;
             
             _logger.LogInformation($"{nameof(GameHub)} | {userId}: Game disconnecting was requested");

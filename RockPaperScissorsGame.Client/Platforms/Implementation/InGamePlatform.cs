@@ -22,17 +22,17 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
 
         private readonly IInGameService _inGameService;
         private readonly IConnectionService _connectionService;
-        private readonly IOptions<AppSettings> _appSettings;
+        private readonly IOptions<TimeoutSettings> _timeoutSettings;
         private readonly ILogger<InGamePlatform> _logger;
 
         public InGamePlatform(IInGameService inGameService,
                                 IConnectionService connectionService, 
-                                IOptions<AppSettings> appSettings, 
+                                IOptions<TimeoutSettings> timeoutSettings, 
                                 ILogger<InGamePlatform> logger)
         {
             _inGameService = inGameService;
             _connectionService = connectionService;
-            _appSettings = appSettings;
+            _timeoutSettings = timeoutSettings;
             _logger = logger;
         }
 
@@ -92,7 +92,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                     await _inGameService.MakeMoveAsync(PlayerId, MoveOptions.Undefined, isMoveMadeInTime);
                 }),
                 null,
-                _appSettings.Value?.MoveTimeout ?? 20000,
+                _timeoutSettings.Value?.MoveTimeout ?? 20000,
                 Timeout.Infinite
                 );
             Console.ForegroundColor = ConsoleColor.Green;
@@ -134,7 +134,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
             if (isMoveMadeInTime)
             {
                 await timer.DisposeAsync();
-                _keepSessionActiveTimer.Change(_appSettings.Value?.SeriesTimeout ?? 300000, Timeout.Infinite);
+                _keepSessionActiveTimer.Change(_timeoutSettings.Value?.SeriesTimeout ?? 300000, Timeout.Infinite);
                 _logger.LogInformation($"{nameof(InGamePlatform)}: Move made in time");
                 await _inGameService.MakeMoveAsync(PlayerId, figure, isMoveMadeInTime);
             } 
@@ -158,7 +158,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                     }
                 }),
                 null,
-                _appSettings.Value?.SeriesTimeout ?? 300000,
+                _timeoutSettings.Value?.SeriesTimeout ?? 300000,
                 Timeout.Infinite
             );
 

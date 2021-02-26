@@ -2,7 +2,7 @@
 
 namespace RockPaperScissorsGame.Server.Models.Game
 {
-    public class OfflineRound : RoundBase
+    /*public class OfflineRound : RoundBase
     {
         public readonly MoveOptions BotMoveOption;
         public readonly MoveOptions UserMoveOption;
@@ -15,5 +15,5 @@ namespace RockPaperScissorsGame.Server.Models.Game
             RoundResult = result;
         }
         
-    }
+    }*/
 }

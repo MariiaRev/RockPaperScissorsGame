@@ -142,14 +142,14 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 {
                     (var success, var message ) = await _signingService.RegisterAsync(login, password);
                     Console.WriteLine($"\n\n{message}");
-                    if (success)
+                    /*if (success)
                     {
                         Console.WriteLine($"User '{login}' was successfully registered");
                     }
                     else
                     {                        
                         Console.WriteLine("Error occured during the registration process. Please, try again later");
-                    }
+                    }*/
                 }
                 catch (ConnectionException exception)
                 {
@@ -186,6 +186,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         
         private async Task ShowLeaderboardAsync()
         {
+            //todo
             Console.WriteLine("TODO");
         }
 

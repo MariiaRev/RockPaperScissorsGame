@@ -18,5 +18,15 @@
     "userId": 4,
     "login": "login4",
     "password": "12341234"
+  },
+  {
+    "userId": 5,
+    "login": "abcd",
+    "password": "111111"
+  },
+  {
+    "userId": 6,
+    "login": "abcd1",
+    "password": "111111"
   }
 ]
