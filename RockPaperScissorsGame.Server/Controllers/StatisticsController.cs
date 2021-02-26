@@ -53,7 +53,8 @@ namespace RockPaperScissorsGame.Server.Controllers
                 var statisticsOut = statistics
                     .Join(users, st => st.Id, us => us.Id,
                           (stat, user) => ModelsMapper.ToStatisticsOut(user.Item.GetLogin(), stat.Item))
-                    .Where(st => st.TotalRoundsCount > _options.MinRoundsCount);
+                    .Where(st => st.TotalRoundsCount > _options.MinRoundsCount)
+                    .OrderByDescending(st => st.TotalOutcomesCounts.WinsCount);
 
                 _logger.LogInformation($"{nameof(StatisticsController)}: Show statistics for {statisticsOut.Count()} user(s). Return {HttpStatusCode.OK}");
                 return Ok(statisticsOut);
