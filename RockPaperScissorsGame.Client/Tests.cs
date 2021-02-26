@@ -68,9 +68,12 @@ namespace RockPaperScissorsGame.Client
             #endregion
 
             #region Tests for requests to the server for statistics with user interactions
-            await _userInteractions.AuthorizeUserAsync();
+            //await _userInteractions.RegisterUserAsync();
+            //await _userInteractions.RegisterUserAsync();
+            //await _userInteractions.AuthorizeUserAsync();
+            //await _userInteractions.AuthorizeUserAsync();
             await _userInteractions.ShowLeaderboardAsync();
-            await Task.Delay(60000);
+            await Task.Delay(5000);
             await _userInteractions.ShowUserStatisticsAsync();
             #endregion
 

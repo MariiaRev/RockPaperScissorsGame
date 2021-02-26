@@ -41,7 +41,7 @@ namespace RockPaperScissorsGame.Server.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(StatisticsOut), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetStatisticsAsync()
         {
             _logger.LogInformation($"{nameof(StatisticsController)}: Request to get general statistics.");
@@ -56,12 +56,15 @@ namespace RockPaperScissorsGame.Server.Controllers
                     .Where(st => st.TotalRoundsCount > _options.MinRoundsCount)
                     .OrderByDescending(st => st.TotalOutcomesCounts.WinsCount);
 
-                _logger.LogInformation($"{nameof(StatisticsController)}: Show statistics for {statisticsOut.Count()} user(s). Return {HttpStatusCode.OK}");
-                return Ok(statisticsOut);
+                if (statisticsOut.Count() > 0)
+                {
+                    _logger.LogInformation($"{nameof(StatisticsController)}: Show statistics for {statisticsOut.Count()} user(s). Return {HttpStatusCode.OK}");
+                    return Ok(statisticsOut);
+                }
             }
 
             _logger.LogInformation($"{nameof(StatisticsController)}: No statisctics to show. Return {HttpStatusCode.OK}");
-            return Ok("No statistics yet.");
+            return Ok();
         }
 
         [HttpGet("user")]

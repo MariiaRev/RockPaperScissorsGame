@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RockPaperScissorsGame.Client.Models;
 using RockPaperScissorsGame.Client.Options;
+using RockPaperScissorsGame.Client.Helpers;
 
 namespace RockPaperScissorsGame.Client.Services
 {
@@ -174,6 +175,12 @@ namespace RockPaperScissorsGame.Client.Services
                     var statistics = JsonConvert.DeserializeObject<List<UserStatistics>>(content);
                     _logger.LogInformation($"{nameof(UserInteractions)}: The leaderboard is deserialised.");
 
+                    if (statistics == null)
+                    {
+                        Console.WriteLine($"\n\nNo statistics in the leaderboard yet.");
+                        return;
+                    }
+
                     // show leaderboard
                     Console.WriteLine($"\n\n{" ", 4}$$$ LEADERBOARD $$$\n");
 
@@ -270,7 +277,7 @@ namespace RockPaperScissorsGame.Client.Services
             }
 
             _logger.LogInformation($"{nameof(UserInteractions)}: Login and password are accepted.");
-            return (login, password);
+            return (login, password.GetDeterministicHashCode().ToString());
         }
 
         private bool IsBlocked()
