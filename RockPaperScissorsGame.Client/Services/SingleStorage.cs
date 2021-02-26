@@ -1,4 +1,6 @@
-﻿namespace RockPaperScissorsGame.Client.Services
+﻿using System.Threading.Tasks;
+
+namespace RockPaperScissorsGame.Client.Services
 {
     public class SingleStorage<T> : ISingleStorage<T>
     {
@@ -6,6 +8,16 @@
         public void Update(T item)
         {
             _data[0] = item;
+        }
+
+        public Task UpdateAsync(T item)
+        {
+            Update(item);
+            return Task.CompletedTask;
+        }
+        public T Get()
+        {
+            return _data[0];
         }
     }
 }

@@ -18,5 +18,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Statistics\" />
+  </ItemGroup>
+
 
 </Project>
