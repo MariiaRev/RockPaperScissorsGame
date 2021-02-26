@@ -128,7 +128,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                     continue;
                 }
 
-                if (Enum.TryParse(userInput, out figure) == false)
+                if (!int.TryParse(userInput.Trim(), out int figureNumber) || figureNumber < 1 || figureNumber > 3 || Enum.TryParse(userInput, out figure) == false)
                 {
                     Console.WriteLine("Unknown figure. Try again\n");
                     continue;
