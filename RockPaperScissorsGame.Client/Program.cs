@@ -37,6 +37,7 @@ namespace RockPaperScissorsGame.Client
                     .AddSingleton<IGameService, GameService>()
                     .AddSingleton<IInGameService, InGameService>()
                     .AddSingleton<ISigningService, SigningService>()
+                    .AddSingleton<IStatisticsService, StatisticsService>()
                     .AddSingleton<IUserInput, UserInput>()
                     .AddSingleton(typeof(ISingleStorage<>), typeof(SingleStorage<>))
                     //.AddSingleton<ForAuthorizationAndRegistration>()

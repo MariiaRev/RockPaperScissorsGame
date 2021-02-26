@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
+using Newtonsoft.Json;
 using RockPaperScissorsGame.Client.Exceptions;
+using RockPaperScissorsGame.Client.Helpers.Abstract;
+using RockPaperScissorsGame.Client.Models;
 using RockPaperScissorsGame.Client.Platforms.Abstract;
 using RockPaperScissorsGame.Client.Platforms.Base;
 using RockPaperScissorsGame.Client.Services.Abstract;
@@ -14,15 +17,21 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
     public class GamePlatform : BasePlatform, IGamePlatform
     {
         private readonly IGameService _gameService;
+        private readonly IStatisticsService _statisticsService;
         private readonly IInGamePlatform _inGamePlatform;
+        private readonly ISingleStorage<AuthInfo> _authInfo;
         private readonly ILogger<GamePlatform> _logger;
 
         public GamePlatform(IGameService gameService, 
-            IInGamePlatform inGamePlatform, 
-            ILogger<GamePlatform> logger)
+                            IStatisticsService statisticsService,
+                            IInGamePlatform inGamePlatform, 
+                            ISingleStorage<AuthInfo> authInfo,
+                            ILogger<GamePlatform> logger)
         {
             _gameService = gameService;
+            _statisticsService = statisticsService;
             _inGamePlatform = inGamePlatform;
+            _authInfo = authInfo;
             _logger = logger;
         }
         
@@ -193,21 +202,117 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
         
         private async Task ShowPersonalStatisticsAsync()
         {
-            _logger.LogInformation($"{nameof(GamePlatform)}: User requested personal statistics");
-            //todo
-            Console.WriteLine("TODO");
+            var authInfo = _authInfo.Get();
+            if (authInfo == null || authInfo?.Token == null)
+            {
+                Console.WriteLine("\n\nPlease, authorize before viewing personal statistics.");
+                _logger.LogInformation($"{nameof(MainPlatform)}: The user is unathorized and cannot view personal statistics.");
+                return;
+            }
+
+            // if user is authorized
+            // ask to send request to save user in-game time
+            await _statisticsService.SaveUserGameTime();
+
+            // ask to send request for statistics
+            (var success, var content) = await _statisticsService.GetUserStatisticsAsync();
+
+            if (success)
+            {
+                try
+                {
+                    _logger.LogInformation($"{nameof(MainPlatform)}: The user statistics is recieved.");
+
+                    // try deserialise json string (content) into list of UserStatistics
+                    var statistics = JsonConvert.DeserializeObject<UserStatistics>(content);
+                    _logger.LogInformation($"{nameof(MainPlatform)}: The user statistics is deserialized and shown.");
+                    Console.WriteLine($"\n\n{" ", 4}$$$ Your statistics $$$\n\n{statistics}");
+                    Console.WriteLine("-----------------------------------------------------------------");
+                }
+                catch (JsonSerializationException)
+                {
+                    Console.WriteLine($"\n\nWe're sorry, an error occured. Statistics is temporarily unavailable.");
+                    _logger.LogInformation($"{nameof(MainPlatform)}: Exception during the user statistics deserialization from json.");
+                }
+
+                return;
+            }
+
+            // if no statistics
+            _logger.LogInformation($"{nameof(MainPlatform)}: {content}.");
+            Console.WriteLine($"\n\n{content}");
         }
         
         private async Task ShowLeaderboardAsync()
         {
-            _logger.LogInformation($"{nameof(GamePlatform)}: User requested leaderboard");
+            _logger.LogInformation($"{nameof(MainPlatform)}: Attempt to view the leaderboard.");
 
-            //todo
-            Console.WriteLine("TODO");
+            // if user is authorized save his/her in-game time
+            var authInfo = _authInfo.Get();
+            if (authInfo != null && authInfo?.Token != null)
+            {
+                // ask to send request to save user in-game time
+                await _statisticsService.SaveUserGameTime();
+            }
+
+            // ask to send request for statistics
+            bool success;
+            string content;
+            try
+            {
+                (success, content) = await _statisticsService.GetLeaderboardAsync();
+            }
+            catch (ConnectionException exception)
+            {
+                Console.WriteLine(exception.Message);
+                return;
+            }
+
+            if (success)
+            {
+                try
+                {
+                    _logger.LogInformation($"{nameof(MainPlatform)}: The leaderboard is recieved.");
+
+                    // try deserialise json string (content) into list of UserStatistics
+                    var statistics = JsonConvert.DeserializeObject<List<UserStatistics>>(content);
+                    _logger.LogInformation($"{nameof(MainPlatform)}: The leaderboard is deserialised.");
+
+                    if (statistics == null)
+                    {
+                        Console.WriteLine($"\n\nNo statistics in the leaderboard yet.");
+                        return;
+                    }
+
+                    // show leaderboard
+                    Console.WriteLine($"\n\n{" ", 4}$$$ LEADERBOARD $$$\n");
+
+                    foreach(var userStatistics in statistics)
+                    {
+                        Console.WriteLine($"{userStatistics}");
+                    }
+
+                    Console.WriteLine("-----------------------------------------------------------------");
+                    _logger.LogInformation($"{nameof(MainPlatform)}: Statistics for {statistics.Count} user(s) was shown.");
+                }
+                catch (JsonSerializationException)
+                {
+                    Console.WriteLine($"\n\nWe're sorry, an error occured. Statistics is temporarily unavailable.");
+                    _logger.LogInformation($"{nameof(MainPlatform)}: Exception during the leaderboard deserialization from json.");
+                }
+
+                return;
+            }
+
+            // if no statistics
+            Console.WriteLine($"\n\n{content}");
+            _logger.LogInformation($"{nameof(MainPlatform)}: {content}.");
         }
         
         private void Exit()
         {
+            _statisticsService.SaveUserGameTime();
+            _authInfo.Get().Watch.Reset();
             KeepProgramActive = false;
         }
         

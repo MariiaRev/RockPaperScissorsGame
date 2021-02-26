@@ -32,7 +32,12 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
             {
                 _isWaiting = false;
             });
-
+            
+            _connectionService.Connection.On(GameEvents.GameClosed, () =>
+            {
+                _isWaiting = false;
+            });
+            
             _isConnectionConfigured = true;
             return true;
         }
