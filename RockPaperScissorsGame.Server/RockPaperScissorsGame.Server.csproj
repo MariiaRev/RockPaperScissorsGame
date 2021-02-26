@@ -23,5 +23,9 @@
     <ProjectReference Include="..\RockPaperScissorsGame.Common\RockPaperScissorsGame.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Statistics\" />
+  </ItemGroup>
+
 
 </Project>

@@ -39,7 +39,8 @@ namespace RockPaperScissorsGame.Server.Services.Implementations
         }
 
         /// <summary>
-        /// Saving user statistics both in the storage and in the json file database.
+        /// Saving user statistics both in the storage and in the json file database
+        /// if user is identified by his/her authorization <paramref name="token"/>.
         /// </summary>
         /// <param name="token">User's authorization token.</param>
         /// <param name="outcome">Game outcome. One of <see cref="GameOutcome"/></param>
@@ -62,7 +63,7 @@ namespace RockPaperScissorsGame.Server.Services.Implementations
             // get user id
             var userId = userWithToken.Id;
 
-            // add user to the storage if (s)he doesn't exist
+            // add user statistics to the storage if it doesn't exist
             await _statistics.AddAsync(new UserStatistics(userId), userId, new StatisticsEqualityComparer());
 
             // change state
@@ -104,6 +105,63 @@ namespace RockPaperScissorsGame.Server.Services.Implementations
             }
 
             _logger.LogInformation($"{nameof(StatisticsService)}: Statistics for {statisticsFiles.Length} users was added to the statistics storage.");
+        }
+
+        /// <summary>
+        /// Saves user in-game time both in the storage and in the json file database if user is identified by his/her authorization  
+        /// <paramref name="token"/> and <paramref name="gameTime"/> is successfully parsed to <see cref="long"/>.
+        /// </summary>
+        /// <param name="token">User's authorization token.</param>
+        /// <param name="gameTime">User in-game time in ticks as <see cref="string"/> variable.</param>
+        /// <returns>Returns null if user was found by token and in-game time was successfully 
+        /// parsed to <see cref="long"/>, else returns message with error detalization.</returns>
+        public async Task<string> SaveGameTime(string token, string gameTime)
+        {
+            // get user id
+            var userWithToken = (await _tokens.GetAllAsync()).Where(tk => tk.Item == token).FirstOrDefault();
+
+            // if user was not found
+            if (userWithToken == null)
+            {
+                var message = "The authorization token did not exist or expired.";
+                _logger.LogInformation($"{nameof(StatisticsService)}: User was not identified for saving in-game time. {message}");
+                return message;
+            }
+
+            // get user id
+            var userId = userWithToken.Id;
+            _logger.LogInformation($"{nameof(StatisticsService)}: User with id {userId} was identified by his/her authorization token for saving in-game time.");
+
+            // convert game time
+            if (!long.TryParse(gameTime, out var gameTimeTicks))
+            {
+                var message = $"Cannot parse {gameTime} to {typeof(long)} for the user with id {userId}.";
+                _logger.LogInformation($"{nameof(StatisticsService)}: {message}");
+                return message;
+            }
+
+            var userStatistics = await _statistics.GetAsync(userId);
+
+            // create empty statistics if it doesn't exist
+            if (userStatistics == null)
+            {
+                userStatistics = new UserStatistics(userId);
+            }
+
+            // save to the storage
+            userStatistics.AddGameTime(gameTimeTicks);
+            await _statistics.AddOrUpdateAsync(userId, userStatistics);
+            _logger.LogInformation($"{nameof(StatisticsService)}: In-game time was saved to the statistics storage for the user with id {userId}.");
+
+            // map with StatisticsDb
+            var statisticsToSave = ModelsMapper.ToStatisticsDb(userStatistics);
+
+            //save to file
+            var path = $"{_options.StatisticsPath}{userId}.json";
+            await _jsonDataService.WriteAsync(path, statisticsToSave);
+            _logger.LogInformation($"{nameof(StatisticsService)}: In-game time was saved to the file {path} for the user with id {userId}.");
+
+            return null;
         }
     }
 }

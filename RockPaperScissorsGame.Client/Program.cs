@@ -4,16 +4,17 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RockPaperScissorsGame.Client.Helpers.Abstract;
-using RockPaperScissorsGame.Client.Helpers.Implementations;
 using Serilog;
 
+using RockPaperScissorsGame.Client.Helpers.Abstract;
+using RockPaperScissorsGame.Client.Helpers.Implementations;
 using RockPaperScissorsGame.Client.Platforms.Abstract;
 using RockPaperScissorsGame.Client.Platforms.Implementation;
 using RockPaperScissorsGame.Client.Services.Abstract;
 using RockPaperScissorsGame.Client.Services.Implementation;
 using RockPaperScissorsGame.Client.Settings;
 using RockPaperScissorsGame.Client.Services;
+
 
 namespace RockPaperScissorsGame.Client
 {
@@ -40,7 +41,8 @@ namespace RockPaperScissorsGame.Client
                     .AddSingleton(typeof(ISingleStorage<>), typeof(SingleStorage<>))
                     //.AddSingleton<ForAuthorizationAndRegistration>()
                     //.AddSingleton<UserInteractions>()
-                    
+                    .AddSingleton<RequestsForStatistics>()
+
                     .Configure<ClientSettings>(configuration.GetSection("ClientSettings"))
                     .Configure<UserInfoSettings>(configuration.GetSection("UserInfoSettings"))
                     .Configure<TimeoutSettings>(configuration.GetSection("App"))
@@ -49,8 +51,8 @@ namespace RockPaperScissorsGame.Client
                     
                     .AddLogging(builder => builder.AddSerilog(
                         new LoggerConfiguration()
-                            .WriteTo.File("Logs/client.log")
-                            .CreateLogger()))
+                            .WriteTo.File("Logs/app.log")
+                            .CreateLogger(), true))
                     
                     .BuildServiceProvider();
 
@@ -61,9 +63,9 @@ namespace RockPaperScissorsGame.Client
                 // var gamePlatform = serviceProvider.GetRequiredService<IGamePlatform>();
                 //await gamePlatform.StartAsync("X-PLAYER_ID");
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException exception)
             {
-                Console.WriteLine($"{e.Message}\n\n");
+                Console.WriteLine($"{exception.Message}\n\n");
             }
         }
     }

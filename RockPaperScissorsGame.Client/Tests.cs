@@ -1,11 +1,9 @@
-﻿using Microsoft.Extensions.Options;
-using RockPaperScissorsGame.Client.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
-
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using RockPaperScissorsGame.Client.Services;
 using RockPaperScissorsGame.Client.Settings;
 
 namespace RockPaperScissorsGame.Client
@@ -15,44 +13,69 @@ namespace RockPaperScissorsGame.Client
         private readonly ForAuthorizationAndRegistration _authAndRegistrationService;
         private readonly HttpClient _client;
         private readonly UserInteractions _userInteractions;
+        private readonly RequestsForStatistics _requestsForStatistics;
 
         public Tests(
             ForAuthorizationAndRegistration authAndRegistrationService, 
             HttpClient client,
-            IOptions<ClientSettings> options,
-            UserInteractions userInteractions)
+            IOptions<ClientSettings> settings,
+            UserInteractions userInteractions,
+            RequestsForStatistics requestsForStatistics)
         {
             _authAndRegistrationService = authAndRegistrationService;
             _client = client;
-            _client.BaseAddress = new Uri(options.Value.BaseAddress);
+            _client.BaseAddress = new Uri(settings.Value.BaseAddress);
             _userInteractions = userInteractions;
+            _requestsForStatistics = requestsForStatistics;
         }
 
         public async Task RunAsync()
         {
-            var tests = new List<Task>()
-            {
-                //Test_Success_AuthorizationAsync(),
-                //Test_Fail_AuthorizationAsync(),
-                //Test_Success_RegistrationAsync(),
-                //Test_Fail_RegistrationAsync()
+            #region Tests for requests to the server for login and registration
+            //var tests1 = new List<Task>()
+            //{
+            //    //Test_Success_AuthorizationAsync(),
+            //    //Test_Fail_AuthorizationAsync(),
+            //    //Test_Success_RegistrationAsync(),
+            //    //Test_Fail_RegistrationAsync()
 
-            };
+            //};
 
-            //await Task.WhenAll(tests);
-            Console.WriteLine("Testing auth-n 1");
-            await Test_AuthorizeUserAsync();
-            Console.WriteLine("\n\nTesting auth-n 2");
-            await Test_AuthorizeUserAsync();
+            //await Task.WhenAll(tests1);
+            #endregion
 
-            await Task.Delay(61000);
-            Console.WriteLine("\n\nTesting auth-n 3");
-            await Test_AuthorizeUserAsync();
-
+            #region Tests for login and registration with user interactions
+            //Console.WriteLine("Testing auth-n 1");
+            //await Test_AuthorizeUserAsync();
+            //Console.WriteLine("\n\nTesting auth-n 2");
+            //await Test_AuthorizeUserAsync();
+            //await Task.Delay(61000);
+            //Console.WriteLine("\n\nTesting auth-n 3");
+            //await Test_AuthorizeUserAsync();
             //Console.WriteLine("\n\nTesting registration 1");
             //await Test_RegisterUserAsync();
             //Console.WriteLine("\n\nTesting registration 2");
             //await Test_RegisterUserAsync();
+            #endregion
+
+            #region Tests for requests to the server for statistics
+            //var tests2 = new List<(bool, string)>()
+            //{
+            //    await Test_GetLeaderboard(),
+            //    await Test_GetUserStatistics(),
+            //    await Test_GetUserStatistics()
+            //};
+            #endregion
+
+            #region Tests for requests to the server for statistics with user interactions
+            //await _userInteractions.RegisterUserAsync();
+            //await _userInteractions.RegisterUserAsync();
+            //await _userInteractions.AuthorizeUserAsync();
+            //await _userInteractions.AuthorizeUserAsync();
+            await _userInteractions.ShowLeaderboardAsync();
+            await Task.Delay(5000);
+            await _userInteractions.ShowUserStatisticsAsync();
+            #endregion
 
             Debug.WriteLine("\n\n\n");
         }
@@ -135,6 +158,33 @@ namespace RockPaperScissorsGame.Client
             await _userInteractions.RegisterUserAsync();
         }
 
+        private async Task<(bool, string)> Test_GetLeaderboard()
+        {
+            var result = await _requestsForStatistics.GetLeaderboardAsync();
+            Console.WriteLine($"\n\nLeaderboard request:\n{result.Item2}");
+            return result;
+        }
 
+        private async Task<(bool, string)> Test_GetUserStatistics()
+        {
+            try
+            {
+                // if user is authorized
+                if (await _userInteractions.AuthorizeUserAsync())
+                {
+                    var result = await _requestsForStatistics.GetUserStatisticsAsync();
+                    Console.WriteLine($"\n\nUser statistics:\n{result.Item2}");
+                    return result;
+                }
+
+                Console.WriteLine("\n\nUser is unauthorized.");
+            }
+            catch (ArgumentNullException)
+            {
+                Console.WriteLine("\n\nUnathorized user tried to access personal statistics!");
+            }
+            
+            return (false, null);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using RockPaperScissorsGame.Client.Helpers.Abstract;
+using System.Threading.Tasks;
+using RockPaperScissorsGame.Client.Helpers.Abstract;
 
 namespace RockPaperScissorsGame.Client.Helpers.Implementations
 {
@@ -8,6 +9,16 @@ namespace RockPaperScissorsGame.Client.Helpers.Implementations
         public void Update(T item)
         {
             _data[0] = item;
+        }
+
+        public Task UpdateAsync(T item)
+        {
+            Update(item);
+            return Task.CompletedTask;
+        }
+        public T Get()
+        {
+            return _data[0];
         }
     }
 }

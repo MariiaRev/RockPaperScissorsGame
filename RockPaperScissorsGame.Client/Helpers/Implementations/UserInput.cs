@@ -7,7 +7,7 @@ namespace RockPaperScissorsGame.Client.Helpers.Implementations
     {
         public string ReadString(string message, string tryAgainMessage, uint minLength, string exitWord = null)
         {
-            Console.Write(message);
+            Console.WriteLine(message);
             var userInput = Console.ReadLine()?.Trim();
 
             while (userInput?.Length < minLength)
@@ -15,7 +15,7 @@ namespace RockPaperScissorsGame.Client.Helpers.Implementations
                 Console.WriteLine(tryAgainMessage);
                 userInput = Console.ReadLine()?.Trim();
 
-                if (userInput != null && exitWord != null && userInput.Equals(exitWord, StringComparison.OrdinalIgnoreCase))
+                if (userInput != null &&exitWord != null && userInput.Equals(exitWord, StringComparison.OrdinalIgnoreCase))
                 {
                     return null;
                 }
