@@ -1,8 +1,24 @@
 {
   "userId": 4,
-  "history": {},
-  "rockCount": 0,
-  "paperCount": 0,
-  "scissorsCount": 0,
-  "gameTime": 0
+  "history": {
+    "24.02.2021": {
+      "winsCount": 10,
+      "lossesCount": 8,
+      "drawsCount": 3
+    },
+    "25.02.2021": {
+      "winsCount": 5,
+      "lossesCount": 3,
+      "drawsCount": 12
+    },
+    "26.02.2021": {
+      "winsCount": 4,
+      "lossesCount": 9,
+      "drawsCount": 2
+    }
+  },
+  "rockCount": 18,
+  "paperCount": 18,
+  "scissorsCount": 20,
+  "gameTime": 726000000000
 }

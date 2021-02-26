@@ -23,17 +23,20 @@ namespace RockPaperScissorsGame.Server.Controllers
         private readonly IStorage<User> _users;
         private readonly StatisticsOptions _options;
         private readonly ILogger<StatisticsController> _logger;
+        private readonly IStatisticsService _statisticsService;
 
         public StatisticsController(
             IStorage<UserStatistics> statistics,
             IStorage<User> users,
             IOptions<StatisticsOptions> options,
-            ILogger<StatisticsController> logger)
+            ILogger<StatisticsController> logger,
+            IStatisticsService statisticsService)
         {
             _statistics = statistics;
             _users = users;
             _options = options.Value;
             _logger = logger;
+            _statisticsService = statisticsService;
         }
 
         [HttpGet]
@@ -63,9 +66,10 @@ namespace RockPaperScissorsGame.Server.Controllers
         [HttpGet("user")]
         [ProducesResponseType(typeof(StatisticsOut), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Forbidden)]
         public async Task<IActionResult> GetUserStatistics(
             [FromHeader(Name = "X-AuthToken"), Required]string token,
-            [FromServices] IStorage<string> tokens)
+            [FromServices, Required] IStorage<string> tokens)
         {
             _logger.LogInformation($"{nameof(StatisticsController)}: Request to get user statistics.");
             var userId = (await tokens.GetAllAsync())
@@ -76,6 +80,7 @@ namespace RockPaperScissorsGame.Server.Controllers
             if (userId > 0)     //if user was found
             {
                 _logger.LogInformation($"{nameof(StatisticsController)}: User with id {userId} was identified by his/her authorization token.");
+                
                 // get user statistics
                 var statistics = await _statistics.GetAsync(userId);
 
@@ -92,8 +97,29 @@ namespace RockPaperScissorsGame.Server.Controllers
                 return Ok(statisticsOut);
             }
 
-            _logger.LogInformation($"{nameof(StatisticsController)}: Authorization token did not exist or expired. User was not identified. Return {HttpStatusCode.NotFound}");
-            return NotFound("User was not defined. Repeat authorization, please.");
+            _logger.LogInformation($"{nameof(StatisticsController)}: Authorization token did not exist or expired. User was not identified. Return {HttpStatusCode.Forbidden}");
+            return StatusCode((int)HttpStatusCode.Forbidden, "User was not defined. Repeat authorization, please.");
         }
+
+        [HttpPost("/gametime")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Forbidden)]
+        public async Task<IActionResult> SaveUserInGameTime(
+            [FromHeader(Name = "X-AuthToken"), Required] string token,
+            [FromBody, Required] string gameTime)
+        {
+            _logger.LogInformation($"{nameof(StatisticsController)}: Request to save user in-game time.");
+            var errorMessage = await _statisticsService.SaveGameTime(token, gameTime);
+            
+            if (errorMessage == null)
+            {
+                _logger.LogInformation($"{nameof(StatisticsController)}: Successful request for saving user in-game time. Return {HttpStatusCode.OK}.");
+                return Ok("In-game time was saved.");
+            }
+
+            _logger.LogInformation($"{nameof(StatisticsController)}: {errorMessage} Return {HttpStatusCode.Forbidden}");
+            return StatusCode((int)HttpStatusCode.Forbidden, errorMessage);
+        }
+
     }
 }
