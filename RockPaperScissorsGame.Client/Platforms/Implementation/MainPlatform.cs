@@ -102,7 +102,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                         Console.WriteLine($"\nYou used maximum ({_settings.AuthorizationAttemptsMax}) authorization attempts.");
                         Console.WriteLine($"Authorization is blocked for {_settings.AuthorizationBlockingTime} seconds.");
                         _authBlockedAt = DateTime.Now;
-                        _logger.LogInformation($"{nameof(UserInteractions)}: Authorization was blocked at {_authBlockedAt} for " +
+                        _logger.LogInformation($"{nameof(MainPlatform)}: Authorization was blocked at {_authBlockedAt} for " +
                                                $"{_settings.AuthorizationBlockingTime} seconds after {_authorizationAttempts} unsuccessful attempts.");
                         return;
                     }
@@ -127,7 +127,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Implementation
                 
                 // if user was authorized update his/her auth token
                 await _authInfo.UpdateAsync(new AuthInfo(authToken));
-                _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: A new authorization token was assigned to the user.");
+                _logger.LogInformation($"{nameof(ISigningService)}: A new authorization token was assigned to the user.");
 
                 Console.WriteLine("\nYou are successfully authorized.");
                 _logger.LogInformation($"{nameof(MainPlatform)}: Successful authorization of the user.");

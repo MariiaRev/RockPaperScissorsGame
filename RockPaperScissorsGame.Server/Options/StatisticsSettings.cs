@@ -1,6 +1,6 @@
 ﻿namespace RockPaperScissorsGame.Server.Options
 {
-    public class StatisticsOptions
+    public class StatisticsSettings
     {
         public int MinRoundsCount { get; set; }
     }

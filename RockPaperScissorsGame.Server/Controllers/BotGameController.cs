@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RockPaperScissorsGame.Common;
 using RockPaperScissorsGame.Server.Models.Game;
-using RockPaperScissorsGame.Server.Models.Out;
 using RockPaperScissorsGame.Server.Services.Abstractions;
 
 namespace RockPaperScissorsGame.Server.Controllers
@@ -30,9 +29,9 @@ namespace RockPaperScissorsGame.Server.Controllers
         
         [HttpPost]
         [Route("play")]
-       // [ProducesResponseType(typeof(RoundWithBotResultOut), (int)HttpStatusCode.OK)]
-        //[ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        //[ProducesResponseType(typeof(string), (int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType(typeof(RoundWithBotResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Forbidden)]
         public  async Task<ActionResult<RoundWithBotResult>>  Post([FromHeader(Name = "X-AuthToken"), Required] string userToken, 
                                               [FromBody] string userFigureRaw,
                                               [FromServices] IStorage<string> tokens)

@@ -15,9 +15,9 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
     public class ConnectionService : IConnectionService
     {
         public HubConnection Connection { get; private set; }
-        private readonly IOptions<ClientSettings> _clientSettings;
+        private readonly IOptions<HttpClientSettings> _clientSettings;
 
-        public ConnectionService(IOptions<ClientSettings> clientSettings)
+        public ConnectionService(IOptions<HttpClientSettings> clientSettings)
         {
             _clientSettings = clientSettings;
         }

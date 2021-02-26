@@ -23,7 +23,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
         private readonly HttpClient _client;
         private readonly ILogger<GameService> _logger;
 
-        public GameService(IConnectionService connectionService, HttpClient client, IOptions<ClientSettings> options, ILogger<GameService> logger)
+        public GameService(IConnectionService connectionService, HttpClient client, IOptions<HttpClientSettings> options, ILogger<GameService> logger)
         {
             _connectionService = connectionService;
             _client = client;
@@ -99,7 +99,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
                         
                         return "\nRound summary\n" +
                                           $"Your choice: {roundResult.UserMoveOption}\n" +
-                                          $"Opponent's choice: {roundResult.BotMoveOption}\n" +
+                                          $"Bot's choice: {roundResult.BotMoveOption}\n" +
                                           $"Round result: {roundResult.RoundResult}\n";
 
                     }

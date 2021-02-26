@@ -20,7 +20,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
         
         public StatisticsService(
             HttpClient client,
-            IOptions<ClientSettings> options,
+            IOptions<HttpClientSettings> options,
             ISingleStorage<AuthInfo> authInfo,
             ILogger<StatisticsService> logger)
         {

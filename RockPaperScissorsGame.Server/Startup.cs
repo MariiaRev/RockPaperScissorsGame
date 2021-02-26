@@ -31,8 +31,8 @@ namespace RockPaperScissorsGame.Server
                     .AddSingleton<IStatisticsService, StatisticsService>()
                     .AddSingleton<IUsersService, UsersService>()
                     .AddTransient<IBotGameService, BotGameService>()
-                    .Configure<JsonPathsOptions>(Configuration.GetSection("JsonPaths"))
-                    .Configure<StatisticsOptions>(Configuration.GetSection("StatisticsSettings"));
+                    .Configure<JsonPathsSettings>(Configuration.GetSection("JsonPaths"))
+                    .Configure<StatisticsSettings>(Configuration.GetSection("StatisticsSettings"));
             
             services.AddSingleton<IGameStoringService, GameStoringService>();
             services.AddTransient<IGameService, GameService>();

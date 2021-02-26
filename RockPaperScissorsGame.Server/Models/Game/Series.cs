@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using RockPaperScissorsGame.Common;
-using RockPaperScissorsGame.Server.Exceptions;
 
 namespace RockPaperScissorsGame.Server.Models.Game
 {

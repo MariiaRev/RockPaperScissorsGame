@@ -13,8 +13,6 @@ using RockPaperScissorsGame.Client.Platforms.Implementation;
 using RockPaperScissorsGame.Client.Services.Abstract;
 using RockPaperScissorsGame.Client.Services.Implementation;
 using RockPaperScissorsGame.Client.Settings;
-using RockPaperScissorsGame.Client.Services;
-
 
 namespace RockPaperScissorsGame.Client
 {
@@ -40,11 +38,8 @@ namespace RockPaperScissorsGame.Client
                     .AddSingleton<IStatisticsService, StatisticsService>()
                     .AddSingleton<IUserInput, UserInput>()
                     .AddSingleton(typeof(ISingleStorage<>), typeof(SingleStorage<>))
-                    //.AddSingleton<ForAuthorizationAndRegistration>()
-                    //.AddSingleton<UserInteractions>()
-                    .AddSingleton<RequestsForStatistics>()
-
-                    .Configure<ClientSettings>(configuration.GetSection("ClientSettings"))
+                    
+                    .Configure<HttpClientSettings>(configuration.GetSection("ClientSettings"))
                     .Configure<UserInfoSettings>(configuration.GetSection("UserInfoSettings"))
                     .Configure<TimeoutSettings>(configuration.GetSection("TimeoutSettings"))
                     
@@ -60,9 +55,6 @@ namespace RockPaperScissorsGame.Client
                 var mainPlatform = serviceProvider.GetRequiredService<IMainPlatform>();
                 await mainPlatform.StartAsync(null);
                 
-                //await serviceProvider.GetRequiredService<Tests>().RunAsync();
-                // var gamePlatform = serviceProvider.GetRequiredService<IGamePlatform>();
-                //await gamePlatform.StartAsync("X-PLAYER_ID");
             }
             catch (FileNotFoundException exception)
             {

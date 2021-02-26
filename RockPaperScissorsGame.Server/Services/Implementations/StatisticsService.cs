@@ -21,14 +21,14 @@ namespace RockPaperScissorsGame.Server.Services.Implementations
         private readonly IStorage<UserStatistics> _statistics;
         private readonly IStorage<string> _tokens;
         private readonly JsonDataService<StatisticsDb> _jsonDataService;
-        private readonly JsonPathsOptions _options;
+        private readonly JsonPathsSettings _options;
         private readonly ILogger<StatisticsService> _logger;
 
         public StatisticsService(
             IStorage<UserStatistics> statistics,
             IStorage<string> tokens,
             JsonDataService<StatisticsDb> jsonDataService,
-            IOptions<JsonPathsOptions> jsonOptions,
+            IOptions<JsonPathsSettings> jsonOptions,
             ILogger<StatisticsService> logger)
         {
             _statistics = statistics;

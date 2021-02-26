@@ -15,7 +15,7 @@ namespace RockPaperScissorsGame.Client.Services.Implementation
         private readonly HttpClient _client;
         private readonly ILogger<SigningService> _logger;
 
-        public SigningService(HttpClient client, IOptions<ClientSettings> options, ILogger<SigningService> logger)
+        public SigningService(HttpClient client, IOptions<HttpClientSettings> options, ILogger<SigningService> logger)
         {
             _client = client;
             _logger = logger;

@@ -8,7 +8,7 @@ using RockPaperScissorsGame.Client.Settings;
 
 namespace RockPaperScissorsGame.Client
 {
-    public class Tests
+    /*public class Tests
     {
         private readonly ForAuthorizationAndRegistration _authAndRegistrationService;
         private readonly HttpClient _client;
@@ -186,5 +186,5 @@ namespace RockPaperScissorsGame.Client
             
             return (false, null);
         }
-    }
+    }*/
 }

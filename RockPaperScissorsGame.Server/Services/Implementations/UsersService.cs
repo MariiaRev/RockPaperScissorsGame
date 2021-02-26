@@ -16,7 +16,7 @@ namespace RockPaperScissorsGame.Server.Services.Implementations
         private readonly JsonDataService<UserDb> _userDataService;
         private readonly IStorage<UserStatistics> _statistics;
         private readonly JsonDataService<StatisticsDb> _statDataService;
-        private readonly JsonPathsOptions _options;
+        private readonly JsonPathsSettings _options;
         private readonly ILogger<UsersService> _logger;
 
         public UsersService(
@@ -24,7 +24,7 @@ namespace RockPaperScissorsGame.Server.Services.Implementations
             IStorage<UserStatistics> statistics,
             JsonDataService<UserDb> userDataService,
             JsonDataService<StatisticsDb> statDataService,
-            IOptions<JsonPathsOptions> options,
+            IOptions<JsonPathsSettings> options,
             ILogger<UsersService> logger)
         {
             _users = users;

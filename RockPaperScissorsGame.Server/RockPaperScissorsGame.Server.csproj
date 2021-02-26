@@ -25,8 +25,5 @@
 
   <ItemGroup>
     <Folder Include="Database\Statistics" />
-    <Folder Include="Database\Statistics\" />
   </ItemGroup>
-
-
 </Project>
