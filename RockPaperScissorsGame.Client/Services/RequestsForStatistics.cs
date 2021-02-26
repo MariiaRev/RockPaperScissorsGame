@@ -82,29 +82,45 @@ namespace RockPaperScissorsGame.Client.Services
                 throw new ArgumentNullException(nameof(_authInfo), "Unauthorized user cannot save his/her in-game time.");
             }
 
-            // get in-game time for now and restart user in-game watch
+            // get in-game time for now
             var userGameTime = authInfo.Watch.ElapsedTicks.ToString();
-            authInfo.Watch.Restart();
 
-            var requestMessage = GetRequestMessage(HttpMethod.Post, "/gametime", new StringContent(userGameTime));
+            var requestMessage = GetRequestMessage(HttpMethod.Post, "gametime", new StringContent(string.Empty), userGameTime);
             var response = await _client.SendAsync(requestMessage);
 
             if (response.IsSuccessStatusCode)
             {
+                // in-game time was saved, then, restart the watch
+                authInfo.Watch.Restart();
                 return true;
             }
 
             return false;
         }
-        private HttpRequestMessage GetRequestMessage(HttpMethod method, string uri, HttpContent content)
+        private HttpRequestMessage GetRequestMessage(HttpMethod method, string uri, HttpContent content, string gameTime = null)
         {
+            if (gameTime == null)
+            {
+                return new HttpRequestMessage()
+                {
+                    Method = method,
+                    RequestUri = new Uri(_client.BaseAddress + uri),
+                    Headers =
+                    {
+                        { "X-AuthToken", _authInfo.Get().Token }
+                    },
+                    Content = content
+                };
+            }
+
             return new HttpRequestMessage()
             {
                 Method = method,
                 RequestUri = new Uri(_client.BaseAddress + uri),
                 Headers =
                 {
-                    { "X-AuthToken", _authInfo.Get().Token }
+                    { "X-AuthToken", _authInfo.Get().Token },
+                    { "X-Time", gameTime }
                 },
                 Content = content
             };
