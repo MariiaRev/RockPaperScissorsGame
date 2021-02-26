@@ -37,10 +37,10 @@ namespace RockPaperScissorsGame.Server
             services.AddSingleton<IGameStoringService, GameStoringService>();
             services.AddTransient<IGameService, GameService>();
             
-            services.AddSwaggerGen(c =>
+            /*services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RockPaperScissorsGame.Server", Version = "v1" });
-            });
+            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,8 +52,8 @@ namespace RockPaperScissorsGame.Server
             statisticsService.SetupStorage();
             usersService.SetupStorage();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contrllrs.Notes v1"));
+            //app.UseSwagger();
+            //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contrllrs.Notes v1"));
 
             app.UseRouting();
             
