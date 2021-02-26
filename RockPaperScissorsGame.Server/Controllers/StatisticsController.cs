@@ -106,7 +106,7 @@ namespace RockPaperScissorsGame.Server.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Forbidden)]
         public async Task<IActionResult> SaveUserInGameTime(
             [FromHeader(Name = "X-AuthToken"), Required] string token,
-            [FromBody, Required] string gameTime)
+            [FromHeader(Name = "X-Time"), Required] string gameTime)
         {
             _logger.LogInformation($"{nameof(StatisticsController)}: Request to save user in-game time.");
             var errorMessage = await _statisticsService.SaveGameTime(token, gameTime);
