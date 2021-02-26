@@ -11,6 +11,7 @@ namespace RockPaperScissorsGame.Client.Platforms.Base
         
         public virtual async Task StartAsync(string playerId)
         {
+            KeepProgramActive = true;
             PlayerId = playerId;
             do
             {
