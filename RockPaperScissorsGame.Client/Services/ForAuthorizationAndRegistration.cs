@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
-using RockPaperScissorsGame.Client.Options;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using RockPaperScissorsGame.Client.Options;
 
 namespace RockPaperScissorsGame.Client.Services
 {
@@ -13,10 +14,15 @@ namespace RockPaperScissorsGame.Client.Services
     public class ForAuthorizationAndRegistration
     {
         private readonly HttpClient _client;
-        public ForAuthorizationAndRegistration(HttpClient client, IOptions<ClientOptions> options)
+        private readonly ILogger<ForAuthorizationAndRegistration> _logger;
+        public ForAuthorizationAndRegistration(
+            HttpClient client,
+            IOptions<ClientOptions> options,
+            ILogger<ForAuthorizationAndRegistration> logger)
         {
             _client = client;
             _client.BaseAddress = new Uri(options.Value.BaseAddress);
+            _logger = logger;
         }
 
         /// <summary>
@@ -35,14 +41,18 @@ namespace RockPaperScissorsGame.Client.Services
                 login, password, 
                 new StringContent(string.Empty));
 
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: Sending authorization request." +
+                $" by method {requestMessage.Method} to the {requestMessage.RequestUri} with login and password.");
             var response = await _client.SendAsync(requestMessage);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var token = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: S. Authorization token {token} is recieved.");
                 return token;
             }
 
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: Unsuccessful authorization.");
             return null;
         }
 
@@ -64,14 +74,17 @@ namespace RockPaperScissorsGame.Client.Services
                 login, password, 
                 new StringContent(string.Empty));
 
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: Sending registration request.");
             var response = await _client.SendAsync(requestMessage);
             var responseMessage = await response.Content.ReadAsStringAsync();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
+                _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: {responseMessage}");
                 return (true, responseMessage);
             }
-
+            
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: {responseMessage}");
             return (false, responseMessage);
         }
 

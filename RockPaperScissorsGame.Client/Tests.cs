@@ -1,17 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using RockPaperScissorsGame.Client.Models;
-using RockPaperScissorsGame.Client.Options;
-using RockPaperScissorsGame.Client.Services;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using RockPaperScissorsGame.Client.Options;
+using RockPaperScissorsGame.Client.Services;
 
 namespace RockPaperScissorsGame.Client
 {

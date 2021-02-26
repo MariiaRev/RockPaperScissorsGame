@@ -25,7 +25,7 @@ namespace RockPaperScissorsGame.Client
                 .CreateLogger();
 
                 var serviceProvider = ConfigureServices(new ServiceCollection(), configuration, serilogLogger).BuildServiceProvider();
-                    
+
                 await serviceProvider.GetRequiredService<Tests>().RunAsync();
             }
             catch (FileNotFoundException e)
@@ -35,7 +35,8 @@ namespace RockPaperScissorsGame.Client
         }
         private static IServiceCollection ConfigureServices(IServiceCollection services, IConfiguration configuration, ILogger logger)
         {
-            return services.AddSingleton<Tests>()
+            return services
+                .AddSingleton<Tests>()
                 .AddSingleton<ForAuthorizationAndRegistration>()
                 .AddSingleton<RequestsForStatistics>()
                 .AddSingleton<UserInteractions>()

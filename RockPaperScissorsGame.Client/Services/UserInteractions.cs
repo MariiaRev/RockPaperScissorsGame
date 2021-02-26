@@ -71,7 +71,7 @@ namespace RockPaperScissorsGame.Client.Services
                 {
                     _authorizationAttempts++;
                     _logger.LogInformation($"{nameof(UserInteractions)}: The number of authorization attempts has been increased.");
-                    var authToken = await _authRegistration.AuthorizeAsync(login, password);
+                    var authToken = await _authRegistration.AuthorizeAsync(login, password);                    
 
                     // if user was not authorized
                     if (authToken == null)
@@ -110,6 +110,7 @@ namespace RockPaperScissorsGame.Client.Services
 
                     // if user was authorized update his/her auth token
                     await _authInfo.UpdateAsync(new AuthInfo(authToken));
+                    _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: A new authorization token was assigned to the user.");
 
                     Console.WriteLine("\nYou are succesfully authorized.");
                     _logger.LogInformation($"{nameof(UserInteractions)}: Successful authorization of the user.");
@@ -117,7 +118,7 @@ namespace RockPaperScissorsGame.Client.Services
                 }
                 catch(Exception e)
                 {
-                    Debug.WriteLine(e);
+                    _logger.LogInformation($"{nameof(UserInteractions)}: {e}.");
                 }
             }
 

@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using RockPaperScissorsGame.Client.Options;
 using RockPaperScissorsGame.Client.Models;
-using System.Net;
 
 namespace RockPaperScissorsGame.Client.Services
 {
@@ -14,14 +13,17 @@ namespace RockPaperScissorsGame.Client.Services
     {
         private readonly HttpClient _client;
         private readonly ISingleStorage<AuthInfo> _authInfo;
+        private readonly ILogger<RequestsForStatistics> _logger;
         public RequestsForStatistics(
             HttpClient client,
             IOptions<ClientOptions> options,
-            ISingleStorage<AuthInfo> authInfo)
+            ISingleStorage<AuthInfo> authInfo,
+            ILogger<RequestsForStatistics> logger)
         {
             _client = client;
             _client.BaseAddress = new Uri(options.Value.BaseAddress);
             _authInfo = authInfo;
+            _logger = logger;
         }
 
         /// <summary>
@@ -33,14 +35,17 @@ namespace RockPaperScissorsGame.Client.Services
         /// </returns>
         public async Task<(bool, string)> GetLeaderboardAsync()
         {
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: Sending request to get the leaderboard.");
             var response = await _client.GetAsync("statistics");
             var content = await response.Content.ReadAsStringAsync();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
+                _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: The leaderboard is received.");
                 return (true, content);
             }
 
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: {content}");
             return (false, content);
         }
 
@@ -57,19 +62,23 @@ namespace RockPaperScissorsGame.Client.Services
             var authInfo = _authInfo.Get();
             if (authInfo == null || authInfo?.Token == null)
             {
-                throw new ArgumentNullException(nameof(_authInfo), "Unauthorized user cannot get personal statistics.");
+                var message = "Unauthorized user cannot get personal statistics.";
+                _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: {message}");
+                throw new ArgumentNullException(nameof(_authInfo), message);
             }
 
-
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: Sending request to get user's personal statistics.");
             var requestMessage = GetRequestMessage(HttpMethod.Get, "statistics/user", new StringContent(string.Empty));
             var response = await _client.SendAsync(requestMessage);
             var content = await response.Content.ReadAsStringAsync();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
+                _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: User's personal statistics is received.");
                 return (true, content);
             }
 
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: {content}.");
             return (false, content);
         }
 
@@ -79,11 +88,14 @@ namespace RockPaperScissorsGame.Client.Services
 
             if (authInfo == null || authInfo?.Token == null)
             {
-                throw new ArgumentNullException(nameof(_authInfo), "Unauthorized user cannot save his/her in-game time.");
+                var message = "Unauthorized user cannot save his/her in-game time.";
+                _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: {message}");
+                throw new ArgumentNullException(nameof(_authInfo), message);
             }
 
             // get in-game time for now
             var userGameTime = authInfo.Watch.ElapsedTicks.ToString();
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: Calculated user in-game time. Sending request to save the time.");
 
             var requestMessage = GetRequestMessage(HttpMethod.Post, "gametime", new StringContent(string.Empty), userGameTime);
             var response = await _client.SendAsync(requestMessage);
@@ -92,9 +104,11 @@ namespace RockPaperScissorsGame.Client.Services
             {
                 // in-game time was saved, then, restart the watch
                 authInfo.Watch.Restart();
+                _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: The in-game time was successfully saved.");
                 return true;
             }
 
+            _logger.LogInformation($"{nameof(ForAuthorizationAndRegistration)}: The in-game time was not saved.");
             return false;
         }
         private HttpRequestMessage GetRequestMessage(HttpMethod method, string uri, HttpContent content, string gameTime = null)
