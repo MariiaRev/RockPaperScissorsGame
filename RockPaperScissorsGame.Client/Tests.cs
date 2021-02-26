@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using RockPaperScissorsGame.Client.Options;
 using RockPaperScissorsGame.Client.Services;
+using RockPaperScissorsGame.Client.Settings;
 
 namespace RockPaperScissorsGame.Client
 {
-    public class Tests
+    /*public class Tests
     {
         private readonly ForAuthorizationAndRegistration _authAndRegistrationService;
         private readonly HttpClient _client;
@@ -18,13 +18,13 @@ namespace RockPaperScissorsGame.Client
         public Tests(
             ForAuthorizationAndRegistration authAndRegistrationService, 
             HttpClient client,
-            IOptions<ClientOptions> options,
+            IOptions<ClientSettings> settings,
             UserInteractions userInteractions,
             RequestsForStatistics requestsForStatistics)
         {
             _authAndRegistrationService = authAndRegistrationService;
             _client = client;
-            _client.BaseAddress = new Uri(options.Value.BaseAddress);
+            _client.BaseAddress = new Uri(settings.Value.BaseAddress);
             _userInteractions = userInteractions;
             _requestsForStatistics = requestsForStatistics;
         }
@@ -186,5 +186,5 @@ namespace RockPaperScissorsGame.Client
             
             return (false, null);
         }
-    }
+    }*/
 }

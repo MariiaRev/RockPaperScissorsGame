@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using RockPaperScissorsGame.Server.Services;
 using RockPaperScissorsGame.Server.Options;
 using Microsoft.OpenApi.Models;
+using RockPaperScissorsGame.Server.Hubs;
+using RockPaperScissorsGame.Server.Services.Abstractions;
+using RockPaperScissorsGame.Server.Services.Implementations;
 
 namespace RockPaperScissorsGame.Server
 {
@@ -20,19 +23,24 @@ namespace RockPaperScissorsGame.Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR();
             services.AddControllers();
 
             services.AddSingleton(typeof(IStorage<>), typeof(Storage<>))
                     .AddSingleton(typeof(JsonDataService<>))
                     .AddSingleton<IStatisticsService, StatisticsService>()
                     .AddSingleton<IUsersService, UsersService>()
-                    .Configure<JsonPathsOptions>(Configuration.GetSection("JsonPaths"))
-                    .Configure<StatisticsOptions>(Configuration.GetSection("StatisticsSettings"));
-
-            services.AddSwaggerGen(c =>
+                    .AddTransient<IBotGameService, BotGameService>()
+                    .Configure<JsonPathsSettings>(Configuration.GetSection("JsonPaths"))
+                    .Configure<StatisticsSettings>(Configuration.GetSection("StatisticsSettings"));
+            
+            services.AddSingleton<IGameStoringService, GameStoringService>();
+            services.AddTransient<IGameService, GameService>();
+            
+            /*services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RockPaperScissorsGame.Server", Version = "v1" });
-            });
+            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,14 +52,15 @@ namespace RockPaperScissorsGame.Server
             statisticsService.SetupStorage();
             usersService.SetupStorage();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contrllrs.Notes v1"));
+            //app.UseSwagger();
+            //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contrllrs.Notes v1"));
 
             app.UseRouting();
             
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<GameHub>("/GameHub");
             });
         }
     }

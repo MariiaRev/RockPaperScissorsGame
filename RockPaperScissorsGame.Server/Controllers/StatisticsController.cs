@@ -2,15 +2,17 @@
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
-using RockPaperScissorsGame.Server.Services;
+
 using RockPaperScissorsGame.Server.Options;
 using RockPaperScissorsGame.Server.Helpers;
 using RockPaperScissorsGame.Server.Models;
 using RockPaperScissorsGame.Server.Models.Out;
+using RockPaperScissorsGame.Server.Services.Abstractions;
 
 namespace RockPaperScissorsGame.Server.Controllers
 {
@@ -21,14 +23,14 @@ namespace RockPaperScissorsGame.Server.Controllers
     {
         private readonly IStorage<UserStatistics> _statistics;
         private readonly IStorage<User> _users;
-        private readonly StatisticsOptions _options;
+        private readonly StatisticsSettings _options;
         private readonly ILogger<StatisticsController> _logger;
         private readonly IStatisticsService _statisticsService;
 
         public StatisticsController(
             IStorage<UserStatistics> statistics,
             IStorage<User> users,
-            IOptions<StatisticsOptions> options,
+            IOptions<StatisticsSettings> options,
             ILogger<StatisticsController> logger,
             IStatisticsService statisticsService)
         {

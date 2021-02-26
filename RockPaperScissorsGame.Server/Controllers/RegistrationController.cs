@@ -1,9 +1,11 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using RockPaperScissorsGame.Server.Services;
+
+using RockPaperScissorsGame.Server.Services.Abstractions;
 
 namespace RockPaperScissorsGame.Server.Controllers
 {
